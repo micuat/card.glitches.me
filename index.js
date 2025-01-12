@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 import express from "express";
 import QRCode from "qrcode";
 import bodyParser from "body-parser";
@@ -26,7 +28,7 @@ else {
 }
 
 const app = express()
-const port = 3000
+const port = process.env.PORT;
 
 app.set("view engine", "ejs");
 app.use(express.json());
