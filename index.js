@@ -1,7 +1,18 @@
 import express from "express";
 import QRCode from "qrcode";
 import bodyParser from "body-parser";
+import multer from "multer";
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+
+const upload = multer({ storage: storage });
 import db from "./db.js";
 
 const snapshot = await db.ref('card-set').get();
@@ -24,6 +35,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use("/public", express.static("public"))
+app.use("/uploads", express.static("uploads"))
 
 app.get("/", (req, res) => {
   res.render("pages/index");
@@ -32,10 +44,13 @@ app.get("/", (req, res) => {
 app.get("/view/:pageId", (req, res) => {
   const pageId = req.params.pageId.toUpperCase();
 
-  const dataAvailable = false;
+  const dataAvailable = log[pageId] !== undefined;
 
   if (dataAvailable) {
-    res.render("pages/view", { pageId });
+    res.render("pages/view", {
+      pageId,
+      filename: log[pageId].filename,
+    });
   }
   else {
     res.render("pages/upload", { pageId });
@@ -53,10 +68,17 @@ app.get("/print/:pageId", (req, res) => {
   });
 })
 
-app.post("/upload/:pageId", async (req, res) => {
+app.post("/upload/:pageId", upload.single('cardimg'), async (req, res) => {
+  if (!req.file) {
+    res.status(400).send('<div>No file uploaded.</div>');
+    return;
+  }
+
   const pageId = req.params.pageId.toUpperCase();
   const newCard = {
     author: req.body.author,
+    filename: req.file.filename,
+    path: req.file.path,
   };
   log[pageId] = newCard;
   const ref = await db.ref('card-set').set(log);
