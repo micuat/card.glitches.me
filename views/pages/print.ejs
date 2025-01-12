@@ -190,11 +190,69 @@
        id="text1"><tspan
          sodipodi:role="line"
          id="tspan1"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11667px;font-family:'Apfel Grotezk';-inkscape-font-specification:'Apfel Grotezk';fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-opacity:0"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11667px;font-family:'Helvetica Neue';-inkscape-font-specification:'Apfel Grotezk';fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-opacity:0"
          x="1.4049224"
-         y="79.121101">2025 glitches.me #<%= pageId %></tspan></text></g></svg>
+         y="79.121101">2025 glitches.me</tspan></text><text
+         xml:space="preserve"
+         style="font-size:2.11667px;font-family:Aldrich;-inkscape-font-specification:Aldrich;fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:0.499999;stroke-linejoin:bevel;stroke-miterlimit:10"
+         x="51.876305"
+         y="78.986168"
+         id="text1-9"><tspan
+           sodipodi:role="line"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11667px;font-family:'Helvetica Neue';-inkscape-font-specification:'Apfel Grotezk';text-align:end;text-anchor:end;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-opacity:0"
+           x="51.876305"
+           y="78.986168"
+           id="tspan2">#<%= pageId %></tspan></text>
+      <g
+        fill="grey"
+        transform="translate(38.5 63.3) scale(0.41 0.41)">
+       <%- qrcode %>
+      </g>
+    </g>
+  </svg>
 
+  <button class="bg-grey-500" onclick="downloadPNG()">download</button>
 </main>
+
+<script>
+  //https://www.beaubus.com/blog/how_to_save_inline_svg_as_png_with_vanilla_javascript_and_html_canvas.html
+
+  function downloadPNG() {
+    // specify png with and height in pixels
+    var png_width = 835;
+    var png_height = 1260;
+
+    var inline_svg = document.querySelector("svg").outerHTML; // code of inline SVG
+
+    var canvas = document.createElement("canvas"); // create <canvas> element
+    // The 2D Context provides objects, methods, and properties to draw 
+    // and manipulate graphics on a canvas drawing surface.
+    var context = canvas.getContext("2d");
+
+    // set canvas with and height equal to png with and height
+    canvas.width = png_width;
+    canvas.height = png_height;
+
+    let image = new Image; // create <img> element
+    image.onload = () => {
+        context.fillStyle = "white";
+        context.fillRect(0, 0, canvas.width, canvas.height); 
+        context.scale(4.15,4.15)
+        // define fill (specify 'no-repeat' if you don't want it to repeat
+        // context.fillStyle = context.createPattern(image, 'no-repeat'); 
+        // // fill rectangle with defined fill
+        // context.fillRect(0, 0, canvas.width, canvas.height); 
+        context.drawImage(image,0,0,image.width,image.height);
+        var link = document.createElement("a");
+        link.setAttribute('download', `template-<%= pageId %>.png`);
+        link.setAttribute('href', canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"));
+        link.click();
+    };
+
+    // btoa — binary string to ASCII (Base64-encoded)
+    image.src = 'data:image/svg+xml;base64,' + btoa(inline_svg); 
+}
+</script>
 
 </body>
 </html>

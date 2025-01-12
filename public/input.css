@@ -1,3 +1,5 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face{font-family:"Apfel Grotezk";src:url(https://cdn.glitches.me/ApfelGrotezk-Regular.woff2) format("woff2"),url(https://cdn.glitches.me/ApfelGrotezk-Regular.woff) format("woff")}html,body{font-weight:400;margin:0;padding:0}

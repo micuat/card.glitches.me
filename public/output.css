@@ -535,6 +535,12 @@ video {
 .mr-auto {
   margin-right: auto;
 }
+.inline {
+  display: inline;
+}
+.transform {
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
 .text-center {
   text-align: center;
 }
@@ -548,3 +554,5 @@ video {
 .underline {
   text-decoration-line: underline;
 }
+
+@font-face{font-family:"Apfel Grotezk";src:url(https://cdn.glitches.me/ApfelGrotezk-Regular.woff2) format("woff2"),url(https://cdn.glitches.me/ApfelGrotezk-Regular.woff) format("woff")}html,body{font-weight:400;margin:0;padding:0}
