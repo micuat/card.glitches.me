@@ -4,6 +4,7 @@ import express from "express";
 import QRCode from "qrcode";
 import bodyParser from "body-parser";
 import multer from "multer";
+import sharp from "sharp";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -51,12 +52,18 @@ app.get("/view/:pageId", (req, res) => {
   if (dataAvailable) {
     res.render("pages/view", {
       pageId,
-      filename: log[pageId].filename,
+      filename: log[pageId].filenameMid,
     });
   }
   else {
     res.render("pages/upload", { pageId });
   }
+})
+
+app.get("/edit/:pageId", (req, res) => {
+  const pageId = req.params.pageId.toUpperCase();
+
+  res.render("pages/upload", { pageId });
 })
 
 app.get("/print/:pageId", (req, res) => {
@@ -76,10 +83,26 @@ app.post("/upload/:pageId", upload.single('cardimg'), async (req, res) => {
     return;
   }
 
+  await sharp(`uploads/${req.file.filename}`)
+  .rotate()
+  .resize(720)
+  .toFile(`uploads/${ req.file.filename }-mid.jpeg`, (err, info) => {
+    console.log(err, info);
+  });
+
+  await sharp(`uploads/${req.file.filename}`)
+  .rotate()
+  .resize(360)
+  .toFile(`uploads/${ req.file.filename }-thumb.jpeg`, (err, info) => {
+    console.log(err, info);
+  });
+
   const pageId = req.params.pageId.toUpperCase();
   const newCard = {
     author: req.body.author,
     filename: req.file.filename,
+    filenameMid: `${ req.file.filename }-mid.jpeg`,
+    filenameThumb: `${ req.file.filename }-thumb.jpeg`,
     path: req.file.path,
   };
   log[pageId] = newCard;
