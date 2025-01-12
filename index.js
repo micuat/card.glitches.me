@@ -1,6 +1,18 @@
 import express from "express";
 import QRCode from "qrcode";
 
+import db from "./db.js";
+
+const snapshot = await db.ref('text-log').get();
+let log = snapshot.val();
+if (log === null) {
+  console.log("no data found");
+  log = [];
+}
+else {
+  console.log("data loaded", log);
+}
+
 const app = express()
 const port = 3000
 
@@ -13,7 +25,8 @@ app.get("/", (req, res) => {
 })
 
 app.get("/view/:pageId", (req, res) => {
-  res.send("view" + req.params.pageId)
+  const pageId = req.params.pageId.toUpperCase();
+  res.render("pages/view", { pageId });
 })
 
 app.get("/print/:pageId", (req, res) => {
@@ -27,7 +40,10 @@ app.get("/print/:pageId", (req, res) => {
   });
 })
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
-   
+
+process.on('SIGINT', function() {
+  server.close();
+});
