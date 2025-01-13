@@ -6,9 +6,16 @@
 <body class="container">
 
 <main>
-  <h1 class="text-3xl font-bold underline">
-    Hello world!
+  <h1 class="text-3xl font-bold">
+    card.glitches.me
   </h1>
+  <div class="flex">
+    <% for(var i=0; i<files.length; i++) {%>
+      <a href="/view/<%= files[i].pageId %>">
+        <img class="max-w-sm" src="/uploads/<%= files[i].filename %>"/>
+      </a>
+    <% } %>
+  </div>
 </main>
 
 </body>

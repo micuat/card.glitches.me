@@ -41,7 +41,14 @@ app.use("/public", express.static("public"))
 app.use("/uploads", express.static("uploads"))
 
 app.get("/", (req, res) => {
-  res.render("pages/index");
+  res.render("pages/index", {
+    files: Object.keys(log).map(function (key) {
+      return {
+        pageId: key,
+        filename: log[key].filenameMid,
+      }
+    })
+  });
 })
 
 app.get("/view/:pageId", (req, res) => {
