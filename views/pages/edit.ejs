@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head'); %>
+</head>
+<body class="container">
+
+<main>
+  <h1 class="text-3xl font-bold underline">
+    View <%= pageId %>
+  </h1>
+
+  <form class="p-1 flex flex-col" method="post" enctype="multipart/form-data"
+    hx-post="/upload/<%= pageId %>" hx-target="#response" hx-swap="beforeend" hx-on::after-request="resetAfterRequest()">
+    <input type="submit" hidden />
+    <div class="w-full">
+      <label class="">Author</label>
+      <input id="author" class="border-2 border-sky-500 w-full" type="text" name="author" placeholder="...">
+    </div>
+    <div class="w-full">
+      <label for="cardimg">Choose an image:</label>
+      <input type="file" id="cardimg" name="cardimg" accept="image/png, image/jpeg" />
+    </div>
+    <button class="border-2 border-black">Submit</button>
+  </form>
+  <div id="response" class="">
+
+  </div>
+</main>
+
+<script>
+  const authorName = localStorage.getItem("authorName");
+  document.querySelector("#author").value = authorName;
+
+  function resetAfterRequest() {
+    const authorName = document.querySelector("#author").value;
+    console.log(authorName)
+    localStorage.setItem("authorName", authorName);
+    document.querySelector("form").reset();
+    document.querySelector("#author").value = authorName;
+  }
+</script>
+
+</body>
+</html>

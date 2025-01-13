@@ -63,14 +63,14 @@ app.get("/view/:pageId", (req, res) => {
     });
   }
   else {
-    res.render("pages/upload", { pageId });
+    res.render("pages/edit", { pageId });
   }
 })
 
 app.get("/edit/:pageId", (req, res) => {
   const pageId = req.params.pageId.toUpperCase();
 
-  res.render("pages/upload", { pageId });
+  res.render("pages/edit", { pageId });
 })
 
 app.get("/print/:pageId", (req, res) => {
@@ -85,6 +85,7 @@ app.get("/print/:pageId", (req, res) => {
 })
 
 app.post("/upload/:pageId", upload.single('cardimg'), async (req, res) => {
+  const pageId = req.params.pageId.toUpperCase();
   if (!req.file) {
     res.status(400).send('<div>No file uploaded.</div>');
     return;
@@ -104,17 +105,19 @@ app.post("/upload/:pageId", upload.single('cardimg'), async (req, res) => {
     console.log(err, info);
   });
 
-  const pageId = req.params.pageId.toUpperCase();
   const newCard = {
     author: req.body.author,
     filename: req.file.filename,
     filenameMid: `${ req.file.filename }-mid.jpeg`,
     filenameThumb: `${ req.file.filename }-thumb.jpeg`,
+    date: Date.now(),
     path: req.file.path,
   };
   log[pageId] = newCard;
   const ref = await db.ref('card-set').set(log);
-  return res.send(`<div>New card by ${req.body.author} added!</div>`);
+  return res.send(`<div>
+    New card by ${req.body.author} added! <a href="/view/${ pageId }">View the card</a>
+    </div>`);
 });
 
 const server = app.listen(port, () => {
