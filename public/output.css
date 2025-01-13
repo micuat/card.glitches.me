@@ -562,6 +562,9 @@ video {
 .flex-col {
   flex-direction: column;
 }
+.flex-wrap {
+  flex-wrap: wrap;
+}
 .border-2 {
   border-width: 2px;
 }
