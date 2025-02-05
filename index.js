@@ -6,6 +6,8 @@ import bodyParser from "body-parser";
 import multer from "multer";
 import sharp from "sharp";
 
+import { execFileSync } from "node:child_process";
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/');
@@ -91,33 +93,61 @@ app.post("/upload/:pageId", upload.single('cardimg'), async (req, res) => {
     return;
   }
 
-  await sharp(`uploads/${req.file.filename}`)
+  const imageRaw = `uploads/${req.file.filename}`;
+  const imageMid = `uploads/${ req.file.filename }-mid.jpeg`;
+  const imageThumb = `uploads/${ req.file.filename }-thumb.jpeg`;
+
+  await sharp(imageRaw)
   .rotate()
   .resize(720)
-  .toFile(`uploads/${ req.file.filename }-mid.jpeg`, (err, info) => {
+  .toFile(imageMid, (err, info) => {
     console.log(err, info);
   });
 
-  await sharp(`uploads/${req.file.filename}`)
+  await sharp(imageRaw)
   .rotate()
   .resize(360)
-  .toFile(`uploads/${ req.file.filename }-thumb.jpeg`, (err, info) => {
+  .toFile(imageThumb, (err, info) => {
     console.log(err, info);
   });
 
-  const newCard = {
-    author: req.body.author,
-    filename: req.file.filename,
-    filenameMid: `${ req.file.filename }-mid.jpeg`,
-    filenameThumb: `${ req.file.filename }-thumb.jpeg`,
-    date: Date.now(),
-    path: req.file.path,
-  };
-  log[pageId] = newCard;
-  const ref = await db.ref('card-set').set(log);
-  return res.send(`<div>
-    New card by ${req.body.author} added! <a href="/view/${ pageId }">View the card</a>
-    </div>`);
+  try {
+    const decoderArgs = process.env.USE_DUMMY_QR_DECODER ?
+      ["qrdecoder.py", "-d", "https://card.glitches.me/view/A002", "dummyfilename"] :
+      ["qrdecoder.py", imageRaw];
+    const stdout = execFileSync("python3", decoderArgs, {
+      stdio: "pipe",
+      encoding: "utf8",
+    });
+
+    console.log("qr result", stdout);
+    // TODO: condition - if no result vs multiple lines
+
+    const newCard = {
+      author: req.body.author,
+      filename: req.file.filename,
+      filenameMid: `${ req.file.filename }-mid.jpeg`,
+      filenameThumb: `${ req.file.filename }-thumb.jpeg`,
+      date: Date.now(),
+      path: req.file.path,
+    };
+    log[pageId] = newCard;
+    const ref = await db.ref('card-set').set(log);
+    return res.send(`<div>
+      New card by ${req.body.author} added! <a href="/view/${ pageId }">View the card</a>
+      </div>`);
+  } catch (err) {
+    if (err.code) {
+      console.error(err.code);
+    } else {
+      const { stdout, stderr } = err;
+      console.error({ stdout, stderr });
+    }
+    return res.send(`<div>
+      QR code not detected
+      </div>`); // TODO: make it error code
+  }
+
 });
 
 const server = app.listen(port, () => {
