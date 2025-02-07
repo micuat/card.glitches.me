@@ -65,14 +65,21 @@ app.get("/view/:pageId", (req, res) => {
     });
   }
   else {
-    res.render("pages/edit", { pageId });
+    res.render("pages/upload", { });
   }
 })
 
 app.get("/edit/:pageId", (req, res) => {
   const pageId = req.params.pageId.toUpperCase();
 
-  res.render("pages/edit", { pageId });
+  const dataAvailable = log[pageId] !== undefined;
+
+  if (dataAvailable) {
+    res.render("pages/edit", { pageId });
+  }
+  else {
+    res.render("pages/upload", { });
+  }
 })
 
 app.get("/print/:pageId", (req, res) => {
@@ -86,8 +93,7 @@ app.get("/print/:pageId", (req, res) => {
   });
 })
 
-app.post("/upload/:pageId", upload.single('cardimg'), async (req, res) => {
-  const pageId = req.params.pageId.toUpperCase();
+app.post("/upload", upload.single('cardimg'), async (req, res) => {
   if (!req.file) {
     res.status(400).send('<div>No file uploaded.</div>');
     return;
@@ -120,8 +126,28 @@ app.post("/upload/:pageId", upload.single('cardimg'), async (req, res) => {
       encoding: "utf8",
     });
 
-    console.log("qr result", stdout);
     // TODO: condition - if no result vs multiple lines
+    if (stdout == "") {
+      return res.send(`<div>
+        QR code not detected! This may be because the photo is blurry or the QR code is hidden.
+        </div>`); // TODO: make it error code
+    }
+
+    const stdoutLines = stdout.split("\n").filter(s => s.length > 0);
+
+    if (stdoutLines.length > 1) {
+      return res.send(`<div>
+        Multiple QR code detected! Please make sure only one card is in the photo.
+        </div>`); // TODO: make it error code
+    }
+
+    const pageId = stdoutLines[0].split("https://card.glitches.me/view/")[1];
+
+    if (pageId == null) {
+      return res.send(`<div>
+        QR code corrupted! Did you really take a photo of the card?
+        </div>`); // TODO: make it error code
+    }
 
     const newCard = {
       author: req.body.author,
