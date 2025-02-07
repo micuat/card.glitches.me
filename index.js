@@ -122,7 +122,7 @@ app.post("/upload", upload.single('cardimg'), async (req, res) => {
   });
 
   try {
-    const decoderArgs = process.env.USE_DUMMY_QR_DECODER ?
+    const decoderArgs = process.env.USE_DUMMY_QR_DECODER != 0 ?
       ["qrdecoder.py", "-d", "https://card.glitches.me/view/A002", "dummyfilename"] :
       ["qrdecoder.py", imageRaw];
     const stdout = execFileSync("python3", decoderArgs, {
