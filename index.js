@@ -53,6 +53,10 @@ app.get("/", (req, res) => {
   });
 })
 
+app.get("/upload", (req, res) => {
+  res.render("pages/upload", {});
+})
+
 app.get("/view/:pageId", (req, res) => {
   const pageId = req.params.pageId.toUpperCase();
 
@@ -65,7 +69,7 @@ app.get("/view/:pageId", (req, res) => {
     });
   }
   else {
-    res.render("pages/upload", { });
+    res.redirect("/upload");
   }
 })
 
@@ -78,7 +82,7 @@ app.get("/edit/:pageId", (req, res) => {
     res.render("pages/edit", { pageId });
   }
   else {
-    res.render("pages/upload", { });
+    res.redirect("/upload");
   }
 })
 
