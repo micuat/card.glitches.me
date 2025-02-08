@@ -3,9 +3,10 @@
 <head>
   <%- include('../partials/head'); %>
 </head>
-<body class="container">
-
-<main>
+<body>
+<div class="flex justify-center h-screen w-full">
+  
+<main class="relative flex flex-col h-full max-w-lg w-full">
   <h1 class="text-3xl font-bold underline">
     Print <%= pageId %>
   </h1>
@@ -212,6 +213,8 @@
   </svg>
 
   <button class="bg-grey-500" onclick="downloadPNG()">download</button>
+
+  <a href="/" class="font-bold underline">Back to top</a>
 </main>
 
 <script>
@@ -254,5 +257,6 @@
 }
 </script>
 
+</div>
 </body>
 </html>

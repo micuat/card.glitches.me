@@ -3,9 +3,10 @@
 <head>
   <%- include('../partials/head'); %>
 </head>
-<body class="container">
+<body>
+<div class="flex justify-center h-screen w-full">
 
-<main>
+<main class="relative flex flex-col h-full max-w-lg w-full">
   <h1 class="text-3xl font-bold underline">
     Edit <%= pageId %>
   </h1>
@@ -28,6 +29,8 @@
   <div id="response" class="">
 
   </div>
+
+  <a href="/" class="font-bold underline">Back to top</a>
 </main>
 
 <script>
@@ -43,5 +46,6 @@
   }
 </script>
 
+</div>
 </body>
 </html>

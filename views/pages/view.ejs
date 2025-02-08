@@ -3,20 +3,26 @@
 <head>
   <%- include('../partials/head'); %>
 </head>
-<body class="container">
+<body>
+<div class="flex justify-center h-screen w-full">
 
-<main>
+<main class="relative flex flex-col h-full max-w-lg w-full">
   <h1 class="text-3xl font-bold underline">
     View <%= pageId %>
   </h1>
 
   <img class="max-w-xl" src="/uploads/<%= filename %>" />
 
-  <a href="/edit/<%= pageId %>">Edit</a>
+  <a href="/edit/<%= pageId %>" class="font-bold underline">Edit</a>
   <!-- <button class="bg-grey-500" onclick="downloadPNG()">download</button> -->
+
+  <a href="/" class="font-bold underline">Back to top</a>
+
+  <div class="my-12"></div>
 </main>
 
 <script></script>
 
+</div>
 </body>
 </html>
