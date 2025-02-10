@@ -102,7 +102,7 @@ app.get("/view/:pageId", async (req, res) => {
       pageId,
       filename: `/uploads/${ snapshot.val().filenameMid }`,
       metadata: {
-        title: `pageId by ${ snapshot.val().author }`,
+        title: `${ pageId } by ${ snapshot.val().author }`,
         image: `/uploads/${ snapshot.val().filenameMid }`,
       },
     });
