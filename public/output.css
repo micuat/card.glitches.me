@@ -609,6 +609,9 @@ video {
 .overflow-x-hidden {
   overflow-x: hidden;
 }
+.rounded-none {
+  border-radius: 0px;
+}
 .border-2 {
   border-width: 2px;
 }
@@ -670,6 +673,42 @@ video {
 }
 .htmx-request.htmx-indicator{
   display: unset;
+}
+.file\:mr-4::file-selector-button {
+  margin-right: 1rem;
+}
+.file\:rounded-none::file-selector-button {
+  border-radius: 0px;
+}
+.file\:border-2::file-selector-button {
+  border-width: 2px;
+}
+.file\:border-sky-500::file-selector-button {
+  --tw-border-opacity: 1;
+  border-color: rgb(14 165 233 / var(--tw-border-opacity, 1));
+}
+.file\:px-4::file-selector-button {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.file\:py-2::file-selector-button {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.file\:text-sm::file-selector-button {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.file\:font-semibold::file-selector-button {
+  font-weight: 600;
+}
+.invalid\:border-red-500:invalid {
+  --tw-border-opacity: 1;
+  border-color: rgb(239 68 68 / var(--tw-border-opacity, 1));
+}
+.invalid\:file\:border-red-500::file-selector-button:invalid {
+  --tw-border-opacity: 1;
+  border-color: rgb(239 68 68 / var(--tw-border-opacity, 1));
 }
 .disabled\:bg-gray-50:disabled {
   --tw-bg-opacity: 1;
