@@ -499,6 +499,9 @@ video {
 [hidden]:where(:not([hidden="until-found"])) {
   display: none;
 }
+.static {
+  position: static;
+}
 .absolute {
   position: absolute;
 }
@@ -507,6 +510,9 @@ video {
 }
 .bottom-0 {
   bottom: 0px;
+}
+.z-0 {
+  z-index: 0;
 }
 .my-12 {
   margin-top: 3rem;
@@ -527,11 +533,23 @@ video {
 .hidden {
   display: none;
 }
+.h-6 {
+  height: 1.5rem;
+}
 .h-full {
   height: 100%;
 }
 .h-screen {
   height: 100vh;
+}
+.min-h-8 {
+  min-height: 2rem;
+}
+.w-6 {
+  width: 1.5rem;
+}
+.w-8 {
+  width: 2rem;
 }
 .w-full {
   width: 100%;
@@ -547,6 +565,9 @@ video {
 }
 .transform {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.resize {
+  resize: both;
 }
 .flex-row {
   flex-direction: row;
@@ -615,5 +636,22 @@ video {
 .underline {
   text-decoration-line: underline;
 }
+.filter {
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
 
 @font-face{font-family:"Apfel Grotezk";src:url(https://cdn.glitches.me/ApfelGrotezk-Regular.woff2) format("woff2"),url(https://cdn.glitches.me/ApfelGrotezk-Regular.woff) format("woff")}html,body{font-weight:400;margin:0;padding:0}
+
+.htmx-indicator{
+  display: none;
+}
+.htmx-request .htmx-indicator{
+  display: unset;
+}
+.htmx-request.htmx-indicator{
+  display: unset;
+}
+.disabled\:bg-gray-50:disabled {
+  --tw-bg-opacity: 1;
+  background-color: rgb(249 250 251 / var(--tw-bg-opacity, 1));
+}

@@ -188,7 +188,8 @@ app.post("/upload", upload.single('cardimg'), async (req, res) => {
     };
     const ref = await db.ref(`card-set/${pageId}`).update(newCard);
     return res.send(`<div>
-      New card by ${req.body.author} added! <a href="/view/${ pageId }">View the card</a>
+      <img class="w-8 inline" src="/uploads/${ req.file.filename }-thumb.jpeg">
+      #${pageId} by ${req.body.author} added! <a class="underline" href="/view/${ pageId }">View</a>
       </div>`);
   } catch (err) {
     if (err.code) {

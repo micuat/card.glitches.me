@@ -6,13 +6,14 @@
 <body>
 <div class="flex justify-center h-screen w-full">
 
-<main class="relative flex flex-col h-full max-w-lg w-full">
+<main class="relative flex flex-col h-full max-w-lg w-full z-0">
   <h1 class="text-3xl font-bold">
     Upload the card!
   </h1>
 
   <form class="p-1 flex flex-col space-y-4" method="post" enctype="multipart/form-data"
-    hx-post="/upload" hx-target="#response" hx-swap="beforeend" hx-on::after-request="resetAfterRequest()">
+    hx-post="/upload" hx-target="#response" hx-swap="innerHTML" hx-on::after-request="resetAfterRequest()"
+    hx-disabled-elt="find input[type='text'], find button">
     <input type="submit" hidden />
     <div class="w-full flex flex-row space-x-2">
       <label class="">Author</label>
@@ -22,12 +23,14 @@
       <label for="cardimg">Choose an image:</label>
       <input type="file" id="cardimg" name="cardimg" accept="image/png, image/jpeg" />
     </div>
-    <button class="border-2 border-black py-8">Submit</button>
+    <button class="border-2 border-black py-8 disabled:bg-gray-50">
+      Submit
+      <img id="spinner" class="htmx-indicator w-6 h-6 inline" src="/public/spinner.gif"/>
+    </button>
+    <div id="response" class="min-h-8">
+    </div>
   </form>
   <div>By submitting the card, you agree to share it under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International</a> license.</div>
-  <div id="response" class="">
-
-  </div>
 
   <a href="/" class="font-bold underline">Back to top</a>
 </main>
