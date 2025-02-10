@@ -1,6 +1,6 @@
 <% for(var i=0; i<list.files.length; i++) {%>
   <a class="relative" href="/view/<%= list.files[i].pageId %>">
-    <img class="max-w-sm" src="/uploads/<%= list.files[i].filename %>"/>
+    <img class="max-w-sm" src="<%= list.files[i].filename %>"/>
     <div class="absolute bottom-0 text-lg bg-white/75">by <%= list.files[i].author %></div>
   </a>
 <% } %>

@@ -51,7 +51,7 @@ async function genNextList(start) {
   const files = keys.slice(start, start + N).map(function (key) {
     return {
       pageId: key,
-      filename: log[key].filenameMid,
+      filename: `/uploads/${ log[key].filenameMid }`,
       author: log[key].author,
     }
   });
@@ -66,6 +66,7 @@ async function genNextList(start) {
 app.get("/", async (req, res) => {
   res.render("pages/index", {
     list: await genNextList(0),
+    metadata: null,
   });
 })
 
@@ -74,15 +75,20 @@ app.get("/next", async (req, res) => {
 
   res.render("pages/next", {
     list: await genNextList(start),
+    metadata: null,
   });
 })
 
 app.get("/privacy", (req, res) => {
-  res.render("pages/privacy", {});
+  res.render("pages/privacy", {
+    metadata: null,
+  });
 })
 
 app.get("/upload", (req, res) => {
-  res.render("pages/upload", {});
+  res.render("pages/upload", {
+    metadata: null,
+  });
 })
 
 app.get("/view/:pageId", async (req, res) => {
@@ -94,7 +100,11 @@ app.get("/view/:pageId", async (req, res) => {
   if (dataAvailable) {
     res.render("pages/view", {
       pageId,
-      filename: snapshot.val().filenameMid,
+      filename: `/uploads/${ snapshot.val().filenameMid }`,
+      metadata: {
+        title: `pageId by ${ snapshot.val().author }`,
+        image: `/uploads/${ snapshot.val().filenameMid }`,
+      },
     });
   }
   else {
@@ -109,7 +119,10 @@ app.get("/edit/:pageId", async (req, res) => {
   const dataAvailable = snapshot.exists();
 
   if (dataAvailable) {
-    res.render("pages/edit", { pageId });
+    res.render("pages/edit", {
+      pageId,
+      metadata: null,
+    });
   }
   else {
     res.redirect("/upload");
@@ -123,6 +136,7 @@ app.get("/print/:pageId", (req, res) => {
     res.render("pages/print", {
       pageId,
       qrcode: string.replace(/<\/?svg[^>]*>/g, "").replace(/<path fill[^>]*>/g, ""),
+      metadata: null,
     });
   });
 })

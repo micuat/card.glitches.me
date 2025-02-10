@@ -9,17 +9,32 @@
   content="card.glitches.me"
 />
 <meta name="robots" content="index,follow" />
-<meta property="og:title" content="card.glitches.me" />
-<meta property="og:type" content="platform" />
-<meta property="og:url" content="https://card.glitches.me" />
-<meta property="og:image" content="https://card.glitches.me/public/cards-card.jpg">
-<meta
-  property="og:description"
-  content="Digital/physical hybrid platform for artists to share their cards"
-/>
-<meta name="twitter:card" content="summary" />
 
-<title>card.glitches.me</title>
+<meta name="twitter:card" content="summary" />
+<meta property="og:type" content="platform" />
+
+<% if (metadata) { %>
+  <meta property="og:title" content="<%= metadata.title %>" />
+  <meta property="og:url" content="https://card.glitches.me/" />
+  <meta property="og:image" content="<%= metadata.image %>">
+  <meta
+    property="og:description"
+    content="Card <%= metadata.title %>"
+  />
+  
+  <title><%= metadata.title %></title>
+<% } else { %>
+  <meta property="og:title" content="card.glitches.me" />
+  <meta property="og:url" content="https://card.glitches.me" />
+  <meta property="og:image" content="https://card.glitches.me/public/cards-card.jpg">
+  <meta
+    property="og:description"
+    content="Digital/physical hybrid platform for artists to share their cards"
+  />
+  
+  <title>card.glitches.me</title>
+<% } %>
+
 <link href="/public/output.css" rel="stylesheet">
 <!-- <script src="https://cdn.tailwindcss.com"></script> -->
 <script src="https://unpkg.com/htmx.org@1.9.9" type="module" defer></script>
