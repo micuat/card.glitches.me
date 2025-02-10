@@ -43,16 +43,37 @@ app.use(bodyParser.json());
 app.use("/public", express.static("public"))
 app.use("/uploads", express.static("uploads"))
 
-app.get("/", async (req, res) => {
+async function genNextList(start) {
+  const N = 10;
+
   const log = (await db.ref('card-set').get()).val();
+  const keys = Object.keys(log).reverse();
+  const files = keys.slice(start, start + N).map(function (key) {
+    return {
+      pageId: key,
+      filename: log[key].filenameMid,
+      author: log[key].author,
+    }
+  });
+  const next = start + N;
+  return {
+    files: files,
+    next,
+    more: next < keys.length,
+  }
+}
+
+app.get("/", async (req, res) => {
   res.render("pages/index", {
-    files: Object.keys(log).reverse().map(function (key) {
-      return {
-        pageId: key,
-        filename: log[key].filenameMid,
-        author: log[key].author,
-      }
-    })
+    list: await genNextList(0),
+  });
+})
+
+app.get("/next", async (req, res) => {
+  const start = req.query.start === undefined ? 0 : parseInt(req.query.start);
+
+  res.render("pages/next", {
+    list: await genNextList(start),
   });
 })
 
