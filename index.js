@@ -162,7 +162,7 @@ app.post("/upload", upload.single('cardimg'), async (req, res) => {
 
     // TODO: condition - if no result vs multiple lines
     if (stdout == "") {
-      return res.send(`<div>
+      return res.send(`<div class="text-red-400">
         QR code not detected! This may be because the photo is blurry or the QR code is hidden.
         </div>`); // TODO: make it error code
     }
@@ -170,7 +170,7 @@ app.post("/upload", upload.single('cardimg'), async (req, res) => {
     const stdoutLines = stdout.split("\n").filter(s => s.length > 0);
 
     if (stdoutLines.length > 1) {
-      return res.send(`<div>
+      return res.send(`<div class="text-red-400">
         Multiple QR code detected! Please make sure only one card is in the photo.
         </div>`); // TODO: make it error code
     }
