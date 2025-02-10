@@ -20,14 +20,15 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 import db from "./db.js";
 
-const snapshot = await db.ref('card-set').get();
-let log = snapshot.val();
-if (log === null) {
-  console.log("no data found");
-  log = {};
-}
-else {
-  console.log("data loaded", log);
+{
+  const snapshot = await db.ref('card-set').get();
+  let log = snapshot.val();
+  if (log === null) {
+    console.log("no data found");
+  }
+  else {
+    console.log("data found:", log);
+  }
 }
 
 const app = express()
@@ -42,9 +43,10 @@ app.use(bodyParser.json());
 app.use("/public", express.static("public"))
 app.use("/uploads", express.static("uploads"))
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
+  const log = (await db.ref('card-set').get()).val();
   res.render("pages/index", {
-    files: Object.keys(log).map(function (key) {
+    files: Object.keys(log).reverse().map(function (key) {
       return {
         pageId: key,
         filename: log[key].filenameMid,
@@ -57,15 +59,16 @@ app.get("/upload", (req, res) => {
   res.render("pages/upload", {});
 })
 
-app.get("/view/:pageId", (req, res) => {
+app.get("/view/:pageId", async (req, res) => {
   const pageId = req.params.pageId.toUpperCase();
 
-  const dataAvailable = log[pageId] !== undefined;
+  const snapshot = await db.ref(`card-set/${pageId}`).get();
+  const dataAvailable = snapshot.exists();
 
   if (dataAvailable) {
     res.render("pages/view", {
       pageId,
-      filename: log[pageId].filenameMid,
+      filename: snapshot.val().filenameMid,
     });
   }
   else {
@@ -161,8 +164,7 @@ app.post("/upload", upload.single('cardimg'), async (req, res) => {
       date: Date.now(),
       path: req.file.path,
     };
-    log[pageId] = newCard;
-    const ref = await db.ref('card-set').set(log);
+    const ref = await db.ref(`card-set/${pageId}`).update(newCard);
     return res.send(`<div>
       New card by ${req.body.author} added! <a href="/view/${ pageId }">View the card</a>
       </div>`);
