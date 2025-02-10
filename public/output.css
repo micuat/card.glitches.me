@@ -570,6 +570,9 @@ video {
   margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(1rem * var(--tw-space-y-reverse));
 }
+.overflow-x-hidden {
+  overflow-x: hidden;
+}
 .border-2 {
   border-width: 2px;
 }
