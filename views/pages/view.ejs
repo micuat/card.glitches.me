@@ -4,7 +4,7 @@
   <%- include('../partials/head'); %>
 </head>
 <body>
-<div class="flex justify-center h-screen w-full">
+<div class="flex justify-center w-full">
 
 <main class="relative flex flex-col h-full max-w-lg w-full">
   <h1 class="text-3xl font-bold">
@@ -16,7 +16,7 @@
   <a href="/edit/<%= pageId %>" class="font-bold underline">Edit</a>
   <!-- <button class="bg-grey-500" onclick="downloadPNG()">download</button> -->
 
-  <a href="/" class="font-bold underline">Back to top</a>
+  <%- include('../partials/footer') %>
 
   <div class="my-12"></div>
 </main>

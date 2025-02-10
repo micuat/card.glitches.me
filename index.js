@@ -77,6 +77,10 @@ app.get("/next", async (req, res) => {
   });
 })
 
+app.get("/privacy", (req, res) => {
+  res.render("pages/privacy", {});
+})
+
 app.get("/upload", (req, res) => {
   res.render("pages/upload", {});
 })
@@ -98,10 +102,11 @@ app.get("/view/:pageId", async (req, res) => {
   }
 })
 
-app.get("/edit/:pageId", (req, res) => {
+app.get("/edit/:pageId", async (req, res) => {
   const pageId = req.params.pageId.toUpperCase();
 
-  const dataAvailable = log[pageId] !== undefined;
+  const snapshot = await db.ref(`card-set/${pageId}`).get();
+  const dataAvailable = snapshot.exists();
 
   if (dataAvailable) {
     res.render("pages/edit", { pageId });
