@@ -50,6 +50,7 @@ app.get("/", async (req, res) => {
       return {
         pageId: key,
         filename: log[key].filenameMid,
+        author: log[key].author,
       }
     })
   });

@@ -10,10 +10,14 @@
   <h1 class="text-3xl font-bold">
     card.glitches.me
   </h1>
+  <div class="text-2xl font-bold underline">
+    <a href="/upload">Upload new card</a>
+  </h1>
   <div class="flex flex-wrap">
     <% for(var i=0; i<files.length; i++) {%>
-      <a href="/view/<%= files[i].pageId %>">
+      <a class="relative" href="/view/<%= files[i].pageId %>">
         <img class="max-w-sm" src="/uploads/<%= files[i].filename %>"/>
+        <div class="absolute bottom-0 text-lg bg-white/75">by <%= files[i].author %></div>
       </a>
     <% } %>
   </div>
