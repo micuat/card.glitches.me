@@ -1,23 +1,14 @@
 import "dotenv/config";
 
 import express from "express";
-import QRCode from "qrcode";
 import bodyParser from "body-parser";
-import multer from "multer";
-import sharp from "sharp";
 
-import { execFileSync } from "node:child_process";
+import uploadRouter from "./routes/upload.js";
+import privacyRouter from "./routes/privacy.js";
+import viewRouter from "./routes/view.js";
+import editRouter from "./routes/edit.js";
+import printRouter from "./routes/print.js";
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
-});
-
-const upload = multer({ storage: storage });
 import db from "./db.js";
 
 {
@@ -42,6 +33,12 @@ app.use(bodyParser.json());
 
 app.use("/public", express.static("public"))
 app.use("/uploads", express.static("uploads"))
+
+app.use('/privacy', privacyRouter);
+app.use('/upload', uploadRouter);
+app.use('/view', viewRouter);
+app.use('/edit', editRouter);
+app.use('/print', printRouter);
 
 async function genNextList(start) {
   const N = 10;
@@ -78,151 +75,6 @@ app.get("/next", async (req, res) => {
     metadata: null,
   });
 })
-
-app.get("/privacy", (req, res) => {
-  res.render("pages/privacy", {
-    metadata: null,
-  });
-})
-
-app.get("/upload", (req, res) => {
-  res.render("pages/upload", {
-    metadata: null,
-  });
-})
-
-app.get("/view/:pageId", async (req, res) => {
-  const pageId = req.params.pageId.toUpperCase();
-
-  const snapshot = await db.ref(`card-set/${pageId}`).get();
-  const dataAvailable = snapshot.exists();
-
-  if (dataAvailable) {
-    res.render("pages/view", {
-      pageId,
-      filename: `/uploads/${ snapshot.val().filenameMid }`,
-      metadata: {
-        title: `${ pageId } by ${ snapshot.val().author }`,
-        image: `/uploads/${ snapshot.val().filenameMid }`,
-      },
-    });
-  }
-  else {
-    res.redirect("/upload");
-  }
-})
-
-app.get("/edit/:pageId", async (req, res) => {
-  const pageId = req.params.pageId.toUpperCase();
-
-  const snapshot = await db.ref(`card-set/${pageId}`).get();
-  const dataAvailable = snapshot.exists();
-
-  if (dataAvailable) {
-    res.render("pages/edit", {
-      pageId,
-      metadata: null,
-    });
-  }
-  else {
-    res.redirect("/upload");
-  }
-})
-
-app.get("/print/:pageId", (req, res) => {
-  const pageId = req.params.pageId.toUpperCase();
-  QRCode.toString(`https://card.glitches.me/view/${ pageId }`, { type: "svg" }, function (err, string) {
-    if (err) throw err
-    res.render("pages/print", {
-      pageId,
-      qrcode: string.replace(/<\/?svg[^>]*>/g, "").replace(/<path fill[^>]*>/g, ""),
-      metadata: null,
-    });
-  });
-})
-
-app.post("/upload", upload.single('cardimg'), async (req, res) => {
-  if (!req.file) {
-    res.status(400).send('<div>No file uploaded.</div>');
-    return;
-  }
-
-  const imageRaw = `uploads/${req.file.filename}`;
-  const imageMid = `uploads/${ req.file.filename }-mid.jpeg`;
-  const imageThumb = `uploads/${ req.file.filename }-thumb.jpeg`;
-
-  await sharp(imageRaw)
-  .rotate()
-  .resize(720)
-  .toFile(imageMid, (err, info) => {
-    console.log(err, info);
-  });
-
-  await sharp(imageRaw)
-  .rotate()
-  .resize(360)
-  .toFile(imageThumb, (err, info) => {
-    console.log(err, info);
-  });
-
-  try {
-    const decoderArgs = process.env.USE_DUMMY_QR_DECODER != 0 ?
-      ["qrdecoder.py", "-d", "https://card.glitches.me/view/A002", "dummyfilename"] :
-      ["qrdecoder.py", imageRaw];
-    const stdout = execFileSync("python3", decoderArgs, {
-      stdio: "pipe",
-      encoding: "utf8",
-    });
-
-    // TODO: condition - if no result vs multiple lines
-    if (stdout == "") {
-      return res.send(`<div class="text-red-400">
-        QR code not detected! This may be because the photo is blurry or the QR code is hidden.
-        </div>`); // TODO: make it error code
-    }
-
-    const stdoutLines = stdout.split("\n").filter(s => s.length > 0);
-
-    if (stdoutLines.length > 1) {
-      return res.send(`<div class="text-red-400">
-        Multiple QR code detected! Please make sure only one card is in the photo.
-        </div>`); // TODO: make it error code
-    }
-
-    const pageId = stdoutLines[0].split("https://card.glitches.me/view/")[1];
-
-    if (pageId == null) {
-      return res.send(`<div>
-        QR code corrupted! Did you really take a photo of the card?
-        </div>`); // TODO: make it error code
-    }
-
-    const newCard = {
-      author: req.body.author,
-      filename: req.file.filename,
-      filenameMid: `${ req.file.filename }-mid.jpeg`,
-      filenameThumb: `${ req.file.filename }-thumb.jpeg`,
-      date: Date.now(),
-      path: req.file.path,
-    };
-    const ref = await db.ref(`card-set/${pageId}`).update(newCard);
-    return res.send(`<div>
-      <img class="w-8 inline" src="/uploads/${ req.file.filename }-thumb.jpeg">
-      #${pageId} by ${req.body.author} added! <a class="underline" href="/view/${ pageId }">View</a>
-      </div>`);
-  } catch (err) {
-    if (err.code) {
-      console.error(err.code);
-    } else {
-      const { stdout, stderr } = err;
-      console.error({ stdout, stderr });
-    }
-    return res.send(`<div>
-      QR code not detected
-      </div>`); // TODO: make it error code
-  }
-
-});
 
 const server = app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
