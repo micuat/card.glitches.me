@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 
 import uploadRouter from "./routes/upload.js";
 import privacyRouter from "./routes/privacy.js";
+import aboutRouter from "./routes/about.js";
 import viewRouter from "./routes/view.js";
 import editRouter from "./routes/edit.js";
 import printRouter from "./routes/print.js";
@@ -35,6 +36,7 @@ app.use("/public", express.static("public"))
 app.use("/uploads", express.static("uploads"))
 
 app.use('/privacy', privacyRouter);
+app.use('/about', aboutRouter);
 app.use('/upload', uploadRouter);
 app.use('/view', viewRouter);
 app.use('/edit', editRouter);
