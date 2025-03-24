@@ -12,6 +12,12 @@ import printRouter from "./routes/print.js";
 
 import db from "./db.js";
 
+import { default as ImageAnalysisClient } from "@azure-rest/ai-vision-image-analysis";
+import { default as ImageAnalysis } from "@azure-rest/ai-vision-image-analysis";
+import { AzureKeyCredential } from "@azure/core-auth";
+
+const createClient = ImageAnalysis.default;
+
 {
   const snapshot = await db.ref('card-set').get();
   let log = snapshot.val();
@@ -81,6 +87,62 @@ app.get("/next", async (req, res) => {
 const server = app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
+async function runOcr() {
+  const log = (await db.ref('card-set').get()).val();
+  const pageIds = Object.keys(log);
+  for(const pageId of pageIds) {
+    if(log[pageId].ocr === undefined) {
+      console.log(`run ocr on ${pageId}`);
+
+      const endpoint = process.env['VISION_ENDPOINT'];
+      const key = process.env['VISION_KEY'];
+
+      const credential = new AzureKeyCredential(key);
+      const client = createClient(endpoint, credential);
+
+      const features = [
+        'Read'
+      ];
+
+      const imageUrl = 'https://card.glitches.me/' + log[pageId].path;
+      console.log(imageUrl)
+
+      async function analyzeImageFromUrl() {
+        const result = await client.path('/imageanalysis:analyze').post({
+          body: {
+              url: imageUrl
+          },
+          queryParameters: {
+              features: features
+          },
+          contentType: 'application/json'
+        });
+
+        const iaResult = result.body;
+        console.log(iaResult);
+        if (iaResult.readResult) {
+          const ref = await db.ref(`card-set/${pageId}/ocr`).update(iaResult.readResult);
+          iaResult.readResult.blocks.forEach(block => {
+            block.lines.forEach(line => {
+              console.log(line.text);
+            });
+          });
+        }
+      }
+
+      analyzeImageFromUrl();
+
+      break;
+    }
+  };
+}
+
+runOcr();
+
+setInterval(() => {
+  runOcr();
+}, 1000 * 60);
 
 process.on('SIGINT', function() {
   server.close();
