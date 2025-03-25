@@ -11,13 +11,21 @@ router.get("/:pageId", async (req, res) => {
   const dataAvailable = snapshot.exists();
 
   if (dataAvailable) {
+    let ocr = "";
+    for (const block of snapshot.val()?.ocr?.blocks) {
+      for (const line of block?.lines) {
+        ocr += line.text + " ";
+      }
+    }
+
     res.render("pages/view", {
       pageId,
       filename: `/uploads/${ snapshot.val().filenameMid }`,
       metadata: {
         title: `${ pageId } by ${ snapshot.val().author }`,
         image: `/uploads/${ snapshot.val().filenameMid }`,
-        ocr: JSON.stringify(snapshot.val().ocr),
+        // ocrRaw: JSON.stringify(snapshot.val().ocr),
+        ocr,
       },
     });
   }

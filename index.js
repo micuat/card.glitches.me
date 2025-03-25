@@ -50,7 +50,6 @@ app.use('/print', printRouter);
 
 async function genNextList(start) {
   const N = 10;
-
   const log = (await db.ref('card-set').get()).val();
   const keys = Object.keys(log).reverse();
   const files = keys.slice(start, start + N).map(function (key) {
