@@ -12,9 +12,13 @@ router.get("/:pageId", async (req, res) => {
 
   if (dataAvailable) {
     let ocr = "";
-    for (const block of snapshot.val()?.ocr?.blocks) {
-      for (const line of block?.lines) {
-        ocr += line.text + " ";
+    if (snapshot.val().ocr !== undefined) {
+      if (snapshot.val().ocr.blocks !== undefined) {
+        for (const block of snapshot.val().ocr.blocks) {
+          for (const line of block?.lines) {
+            ocr += line.text + " ";
+          }
+        }
       }
     }
 
