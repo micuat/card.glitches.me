@@ -91,7 +91,7 @@ async function runOcr() {
   const log = (await db.ref('card-set').get()).val();
   const pageIds = Object.keys(log);
   for(const pageId of pageIds) {
-    if(log[pageId].ocr === undefined) {
+    if(log[pageId].ocr === undefined || log[pageId].ocr === '') {
       console.log(`run ocr on ${pageId}`);
 
       const endpoint = process.env['VISION_ENDPOINT'];
@@ -121,7 +121,9 @@ async function runOcr() {
         const iaResult = result.body;
         console.log(iaResult);
         if (iaResult.readResult) {
-          const ref = await db.ref(`card-set/${pageId}/ocr`).update(iaResult.readResult);
+          const ref = await db.ref(`card-set/${pageId}/ocr`).update(
+            JSON.stringify(iaResult.readResult)
+          );
           iaResult.readResult.blocks.forEach(block => {
             block.lines.forEach(line => {
               console.log(line.text);
