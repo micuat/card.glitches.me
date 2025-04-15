@@ -37,7 +37,8 @@ function preload() {
 }
 
 function setup() {
-  canvas = createCanvas(500, img.height / img.width * 500)
+  const w = Math.min(window.innerWidth, 32 * 16);
+  canvas = createCanvas(w, img.height / img.width * w)
   canvas.parent(select(".p5-insert"));
 }
 
@@ -46,8 +47,8 @@ function draw() {
   let firstLine = true;
   background(255);
 
-  scale(500 / 3000);
-  const scaleFactor = 500 / 3000;
+  const scaleFactor = width / img.width;
+  scale(scaleFactor);
 
   image(img, 0, 0)
 
@@ -56,6 +57,15 @@ function draw() {
   if (json.blocks !== undefined) {
     for (const block of json.blocks) {
       for (const line of block?.lines) {
+        fill(255,240)
+        noStroke()
+        beginShape(QUADS)
+        vertex(line.boundingPolygon[0].x, line.boundingPolygon[0].y, 20)
+        vertex(line.boundingPolygon[1].x, line.boundingPolygon[1].y, 20)
+        vertex(line.boundingPolygon[2].x, line.boundingPolygon[2].y, 20)
+        vertex(line.boundingPolygon[3].x, line.boundingPolygon[3].y, 20)
+        endShape(CLOSE)
+
         const a = Math.atan2(
           line.boundingPolygon[1].y +
             line.boundingPolygon[2].y -
@@ -70,7 +80,13 @@ function draw() {
           line.boundingPolygon[0].y,
           line.boundingPolygon[3].x,
           line.boundingPolygon[3].y
-        )// * 1.2
+        ) * 1
+        const boundWidth = dist(
+          line.boundingPolygon[0].x,
+          line.boundingPolygon[0].y,
+          line.boundingPolygon[1].x,
+          line.boundingPolygon[1].y
+        )
         // const w = textWidth(line.text);
         // scale(
         //   dist(
@@ -94,13 +110,16 @@ function draw() {
           line.boundingPolygon[0].x * scaleFactor, line.boundingPolygon[0].y * scaleFactor
         );
         s.style("z-index", "10");
+        s.style("overflow", "hidden");
         s.style("font-size", `${fontSize * scaleFactor}px`);
-        s.style("transform", `rotate(${a}rad)`);
+        s.style("transform", `rotate(${a}rad) scale(${(boundWidth * scaleFactor)/s.elt.clientWidth}, 1)`);
         s.style("transform-origin", "top left");
-        s.style("background-color", "white");
+        s.style("text-wrap", "nowrap");
+        s.style("font-family", "Arial, sans-serif");
+        // s.style("background-color", "white");
         if (firstLine) {
-          s.style("background-color", "black");
-          s.style("color", "white");
+          // s.style("background-color", "black");
+          // s.style("color", "white");
           s.style("font-weight", "bold");
         } else if (line.text.startsWith("#")) {
           s.style("font-family", "Courier, monospace");
