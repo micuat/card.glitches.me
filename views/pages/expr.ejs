@@ -13,9 +13,10 @@
   </h1>
 
   <!-- <img class="max-w-xl" src="<%= filename %>" alt="<%= metadata.ocr %>" /> -->
-  <div class="max-w-xl p5-insert"></div>
+  <div class="relative max-w-xl p5-insert"></div>
 
   <a href="/edit/<%= pageId %>" class="font-bold underline">Edit</a>
+  <a href="/view/<%= pageId %>" class="font-bold underline">Normal</a>
   <!-- <button class="bg-grey-500" onclick="downloadPNG()">download</button> -->
 
   <%- include('../partials/footer') %>
@@ -28,6 +29,7 @@
 <script>
 let img;
 let json = <%- metadata.ocrRaw %>
+let canvas;
 function preload() {
   // img = loadImage("https://card.glitches.me/uploads/1744296836783-IMG_5562.jpeg");
   img = loadImage("<%= filenameRaw %>");
@@ -35,64 +37,89 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(500, img.height / img.width * 500).parent(select(".p5-insert"));
+  canvas = createCanvas(500, img.height / img.width * 500)
+  canvas.parent(select(".p5-insert"));
 }
 
+
 function draw() {
-  background(220);
-  
-  scale(500 / 3000)
-  
+  let firstLine = true;
+  background(255);
+
+  scale(500 / 3000);
+  const scaleFactor = 500 / 3000;
+
   image(img, 0, 0)
-  
-  fill("red")
-  textSize(100)
-  text(frameCount, 20, 20)
-  
-  textAlign(LEFT, TOP)
-  
+
+  textAlign(LEFT, TOP);
+
   if (json.blocks !== undefined) {
     for (const block of json.blocks) {
       for (const line of block?.lines) {
-        // console.log(line)
-        push()
-      fill(255,230)
-      stroke(0)
-      beginShape(QUADS)
-      vertex(line.boundingPolygon[0].x, line.boundingPolygon[0].y, 20)
-      vertex(line.boundingPolygon[1].x, line.boundingPolygon[1].y, 20)
-      vertex(line.boundingPolygon[2].x, line.boundingPolygon[2].y, 20)
-      vertex(line.boundingPolygon[3].x, line.boundingPolygon[3].y, 20)
-      endShape(CLOSE)
-      
-      // fill("red")
-      // circle(line.boundingPolygon[0].x, line.boundingPolygon[0].y, 20)
-      // fill("purple")
-      // circle(line.boundingPolygon[1].x, line.boundingPolygon[1].y, 20)
-      // fill("blue")
-      // circle(line.boundingPolygon[2].x, line.boundingPolygon[2].y, 20)
-      // fill("skyblue")
-      // circle(line.boundingPolygon[3].x, line.boundingPolygon[3].y, 20)
-      
-            fill(0)
-      const a = Math.atan2((line.boundingPolygon[1].y+line.boundingPolygon[2].y)-(line.boundingPolygon[0].y+line.boundingPolygon[3].y), (line.boundingPolygon[1].x+line.boundingPolygon[2].x)-(line.boundingPolygon[0].x+line.boundingPolygon[3].x))
-      
-      translate(line.boundingPolygon[0].x, line.boundingPolygon[0].y)
-      rotate(a)
-        textSize(dist(line.boundingPolygon[0].x, line.boundingPolygon[0].y, line.boundingPolygon[3].x, line.boundingPolygon[3].y) * 1.2)
-      const w = textWidth(line.text)
-      scale(dist(line.boundingPolygon[0].x, line.boundingPolygon[0].y, line.boundingPolygon[1].x, line.boundingPolygon[1].y)/w, 1)
-        text(line.text, 0, 0)
+        const a = Math.atan2(
+          line.boundingPolygon[1].y +
+            line.boundingPolygon[2].y -
+            (line.boundingPolygon[0].y + line.boundingPolygon[3].y),
+          line.boundingPolygon[1].x +
+            line.boundingPolygon[2].x -
+            (line.boundingPolygon[0].x + line.boundingPolygon[3].x)
+        );
 
+        const fontSize = dist(
+          line.boundingPolygon[0].x,
+          line.boundingPolygon[0].y,
+          line.boundingPolygon[3].x,
+          line.boundingPolygon[3].y
+        )// * 1.2
+        // const w = textWidth(line.text);
+        // scale(
+        //   dist(
+        //     line.boundingPolygon[0].x,
+        //     line.boundingPolygon[0].y,
+        //     line.boundingPolygon[1].x,
+        //     line.boundingPolygon[1].y
+        //   ) / w,
+        //   1
+        // );
 
-        pop()
+        let s;
+        if (line.text.startsWith("#")) {
+          s = createA(`https://duckduckgo.com/?q=${line.text.slice(1)}`, line.text, "_blank");
+        }
+        else {
+          s = createSpan(line.text);
+        }
+        s.parent(select(".p5-insert"));
+        s.position(
+          line.boundingPolygon[0].x * scaleFactor, line.boundingPolygon[0].y * scaleFactor
+        );
+        s.style("z-index", "10");
+        s.style("font-size", `${fontSize * scaleFactor}px`);
+        s.style("transform", `rotate(${a}rad)`);
+        s.style("transform-origin", "top left");
+        s.style("background-color", "white");
+        if (firstLine) {
+          s.style("background-color", "black");
+          s.style("color", "white");
+          s.style("font-weight", "bold");
+        } else if (line.text.startsWith("#")) {
+          s.style("font-family", "Courier, monospace");
+          s.style("color", "blue");
+          s.style("text-decoration", "underline");
+        } else {
+        }
+
+        firstLine = false;
       }
     }
   }
-  
-  noLoop()
+
+  noLoop();
 }
 
+// function draw() {
+//   background(220);
+// }
 </script>
 
 </div>
