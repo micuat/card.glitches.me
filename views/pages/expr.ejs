@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head'); %>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.1/p5.js"></script>
+</head>
+<body>
+<div class="flex justify-center w-full">
+
+<main class="relative flex flex-col h-full max-w-lg w-full">
+  <h1 class="text-3xl font-bold">
+    View <%= pageId %>
+  </h1>
+
+  <!-- <img class="max-w-xl" src="<%= filename %>" alt="<%= metadata.ocr %>" /> -->
+  <div class="max-w-xl p5-insert"></div>
+
+  <a href="/edit/<%= pageId %>" class="font-bold underline">Edit</a>
+  <!-- <button class="bg-grey-500" onclick="downloadPNG()">download</button> -->
+
+  <%- include('../partials/footer') %>
+
+  <div class="my-12"></div>
+  <div>debug info!!</div>
+  <div><%= metadata.ocrRaw %></div>
+</main>
+
+<script>
+let img;
+let json = <%- metadata.ocrRaw %>
+function preload() {
+  // img = loadImage("https://card.glitches.me/uploads/1744296836783-IMG_5562.jpeg");
+  img = loadImage("<%= filenameRaw %>");
+  
+}
+
+function setup() {
+  createCanvas(500, img.height / img.width * 500).parent(select(".p5-insert"));
+}
+
+function draw() {
+  background(220);
+  
+  scale(500 / 3000)
+  
+  image(img, 0, 0)
+  
+  fill("red")
+  textSize(100)
+  text(frameCount, 20, 20)
+  
+  textAlign(LEFT, TOP)
+  
+  if (json.blocks !== undefined) {
+    for (const block of json.blocks) {
+      for (const line of block?.lines) {
+        // console.log(line)
+        push()
+      fill(255,230)
+      stroke(0)
+      beginShape(QUADS)
+      vertex(line.boundingPolygon[0].x, line.boundingPolygon[0].y, 20)
+      vertex(line.boundingPolygon[1].x, line.boundingPolygon[1].y, 20)
+      vertex(line.boundingPolygon[2].x, line.boundingPolygon[2].y, 20)
+      vertex(line.boundingPolygon[3].x, line.boundingPolygon[3].y, 20)
+      endShape(CLOSE)
+      
+      // fill("red")
+      // circle(line.boundingPolygon[0].x, line.boundingPolygon[0].y, 20)
+      // fill("purple")
+      // circle(line.boundingPolygon[1].x, line.boundingPolygon[1].y, 20)
+      // fill("blue")
+      // circle(line.boundingPolygon[2].x, line.boundingPolygon[2].y, 20)
+      // fill("skyblue")
+      // circle(line.boundingPolygon[3].x, line.boundingPolygon[3].y, 20)
+      
+            fill(0)
+      const a = Math.atan2((line.boundingPolygon[1].y+line.boundingPolygon[2].y)-(line.boundingPolygon[0].y+line.boundingPolygon[3].y), (line.boundingPolygon[1].x+line.boundingPolygon[2].x)-(line.boundingPolygon[0].x+line.boundingPolygon[3].x))
+      
+      translate(line.boundingPolygon[0].x, line.boundingPolygon[0].y)
+      rotate(a)
+        textSize(dist(line.boundingPolygon[0].x, line.boundingPolygon[0].y, line.boundingPolygon[3].x, line.boundingPolygon[3].y) * 1.2)
+      const w = textWidth(line.text)
+      scale(dist(line.boundingPolygon[0].x, line.boundingPolygon[0].y, line.boundingPolygon[1].x, line.boundingPolygon[1].y)/w, 1)
+        text(line.text, 0, 0)
+
+
+        pop()
+      }
+    }
+  }
+  
+  noLoop()
+}
+
+</script>
+
+</div>
+</body>
+</html>
