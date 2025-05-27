@@ -25,16 +25,14 @@ router.get("/", (req, res) => {
   });
 })
 
-router.post("/", upload.fields([{ name: 'cardimg', maxCount: 1 }, { name: 'moreimg', maxCount: 3 }]),
-  async (req, res) => {
-  if (!req.files['cardimg'][0]) {
-    res.status(400).send('<div>No file uploaded.</div>');
+async function compressImage(file) {
+  if (!file) {
     return;
   }
 
-  const imageRaw = `uploads/${ req.files['cardimg'][0].filename }`;
-  const imageMid = `uploads/${ req.files['cardimg'][0].filename }-mid.jpeg`;
-  const imageThumb = `uploads/${ req.files['cardimg'][0].filename }-thumb.jpeg`;
+  const imageRaw = `uploads/${ file.filename }`;
+  const imageMid = `uploads/${ file.filename }-mid.jpeg`;
+  const imageThumb = `uploads/${ file.filename }-thumb.jpeg`;
 
   await sharp(imageRaw)
   .rotate()
@@ -50,10 +48,26 @@ router.post("/", upload.fields([{ name: 'cardimg', maxCount: 1 }, { name: 'morei
     console.log(err, info);
   });
 
+  return {
+    filename: file.filename,
+    filenameMid: `${ file.filename }-mid.jpeg`,
+    filenameThumb: `${ file.filename }-thumb.jpeg`,
+  };
+}
+
+router.post("/", upload.fields([{ name: 'cardimg', maxCount: 1 }, { name: 'moreimg', maxCount: 3 }]),
+  async (req, res) => {
+  if (!req.files['cardimg'][0]) {
+    res.status(400).send('<div>No file uploaded.</div>');
+    return;
+  }
+
+  const cardPaths = await compressImage(req.files['cardimg'][0]);
+
   try {
     const decoderArgs = process.env.USE_DUMMY_QR_DECODER != 0 ?
       ["./qrdecoder.py", "-d", "https://card.glitches.me/view/A002", "dummyfilename"] :
-      ["./qrdecoder.py", imageRaw];
+      ["./qrdecoder.py", `uploads/${ cardPaths.filename }`];
     const stdout = execFileSync("python3", decoderArgs, {
       stdio: "pipe",
       encoding: "utf8",
