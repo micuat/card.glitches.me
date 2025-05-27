@@ -16,23 +16,23 @@
     hx-disabled-elt="find input[type='text'], find button">
     <input type="submit" hidden />
     <div class="w-full flex flex-row space-x-2">
-      <label class="">Author</label>
+      <label class="font-bold">Author</label>
       <input id="author" class="border-2 border-sky-500 w-full invalid:border-red-500 rounded-none"
         type="text" name="author" placeholder="...">
     </div>
     <div class="w-full mb-8 flex flex-col">
-      <label for="cardimg">Card Photo </label>
+      <label for="cardimg" class="font-bold">Card Photo </label>
       <input type="file" id="cardimg" name="cardimg" accept="image/png, image/jpeg"
         class="file:mr-4 file:border-2 file:border-sky-500 file:px-4 file:py-2 file:rounded-none
           file:text-sm file:font-semibold hover:file:bg-gray-70 invalid:file:border-red-500""/>
     </div>
     <div class="w-full mb-8 flex flex-col">
-      <label for="cardimg">More Photos (optional) </label>
-      <input type="file" id="cardimg" name="cardimg" accept="image/png, image/jpeg" multiple
+      <label for="moreimg">More Photos (optional) </label>
+      <input type="file" id="moreimg" name="moreimg" accept="image/png, image/jpeg" multiple
         class="file:mr-4 file:border-2 file:border-sky-500 file:px-4 file:py-2 file:rounded-none
           file:text-sm file:font-semibold hover:file:bg-gray-70 invalid:file:border-red-500""/>
     </div>
-    <button class="border-2 border-sky-500 py-8 hover:bg-gray-70 disabled:bg-gray-50 rounded-none">
+    <button class="border-2 border-sky-500 py-8 hover:bg-gray-70 disabled:bg-gray-50 rounded-none font-bold">
       Submit
       <img id="spinner" class="htmx-indicator w-6 h-6 inline" src="/public/spinner.gif"/>
     </button>

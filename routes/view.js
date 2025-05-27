@@ -23,6 +23,13 @@ router.get("/:pageId", async (req, res) => {
       }
     }
 
+    const morePaths = [];
+    if (snapshot.val().morePaths !== undefined) {
+      for (let i = 0; i < snapshot.val().morePaths.length; i++) {
+        morePaths[i] = snapshot.val().morePaths[i].filenameMid;
+      }
+    }
+
     res.render("pages/view", {
       pageId,
       filename: `/uploads/${ snapshot.val().filenameMid }`,
@@ -31,6 +38,7 @@ router.get("/:pageId", async (req, res) => {
         image: `/uploads/${ snapshot.val().filenameMid }`,
         // ocrRaw: JSON.stringify(snapshot.val().ocr),
         ocr,
+        morePaths,
       },
     });
   }

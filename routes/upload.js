@@ -63,6 +63,14 @@ router.post("/", upload.fields([{ name: 'cardimg', maxCount: 1 }, { name: 'morei
   }
 
   const cardPaths = await compressImage(req.files['cardimg'][0]);
+  const morePaths = [];
+
+  if (req.files['moreimg']) {
+    for (let i = 0; i < req.files['moreimg'].length; i++) {
+      morePaths[i] = await compressImage(req.files['moreimg'][i]);
+    }
+  }
+console.log(morePaths)
 
   try {
     const decoderArgs = process.env.USE_DUMMY_QR_DECODER != 0 ?
@@ -103,6 +111,7 @@ router.post("/", upload.fields([{ name: 'cardimg', maxCount: 1 }, { name: 'morei
       filenameThumb: `${ req.files['cardimg'][0].filename }-thumb.jpeg`,
       date: Date.now(),
       path: req.files['cardimg'][0].path,
+      morePaths,
     };
     const ref = await db.ref(`card-set/${pageId}`).update(newCard);
     return res.send(`<div>

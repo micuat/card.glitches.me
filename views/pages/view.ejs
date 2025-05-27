@@ -13,6 +13,10 @@
 
   <img class="max-w-xl" src="<%= filename %>" alt="<%= metadata.ocr %>" />
 
+  <% metadata.morePaths.forEach(function(path) { %>
+    <img class="max-w-xl" src="/uploads/<%= path %>" alt="additional image" />
+  <% }); %> 
+
   <a href="/edit/<%= pageId %>" class="font-bold underline">Edit</a>
   <a href="/expr/<%= pageId %>" class="font-bold underline">Experiment</a>
   <!-- <button class="bg-grey-500" onclick="downloadPNG()">download</button> -->
