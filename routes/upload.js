@@ -25,15 +25,16 @@ router.get("/", (req, res) => {
   });
 })
 
-router.post("/", upload.single('cardimg'), async (req, res) => {
-  if (!req.file) {
+router.post("/", upload.fields([{ name: 'cardimg', maxCount: 1 }, { name: 'moreimg', maxCount: 3 }]),
+  async (req, res) => {
+  if (!req.files['cardimg'][0]) {
     res.status(400).send('<div>No file uploaded.</div>');
     return;
   }
 
-  const imageRaw = `uploads/${req.file.filename}`;
-  const imageMid = `uploads/${ req.file.filename }-mid.jpeg`;
-  const imageThumb = `uploads/${ req.file.filename }-thumb.jpeg`;
+  const imageRaw = `uploads/${ req.files['cardimg'][0].filename }`;
+  const imageMid = `uploads/${ req.files['cardimg'][0].filename }-mid.jpeg`;
+  const imageThumb = `uploads/${ req.files['cardimg'][0].filename }-thumb.jpeg`;
 
   await sharp(imageRaw)
   .rotate()
@@ -83,15 +84,15 @@ router.post("/", upload.single('cardimg'), async (req, res) => {
 
     const newCard = {
       author: req.body.author,
-      filename: req.file.filename,
-      filenameMid: `${ req.file.filename }-mid.jpeg`,
-      filenameThumb: `${ req.file.filename }-thumb.jpeg`,
+      filename: req.files['cardimg'][0].filename,
+      filenameMid: `${ req.files['cardimg'][0].filename }-mid.jpeg`,
+      filenameThumb: `${ req.files['cardimg'][0].filename }-thumb.jpeg`,
       date: Date.now(),
-      path: req.file.path,
+      path: req.files['cardimg'][0].path,
     };
     const ref = await db.ref(`card-set/${pageId}`).update(newCard);
     return res.send(`<div>
-      <img class="w-8 inline" src="/uploads/${ req.file.filename }-thumb.jpeg">
+      <img class="w-8 inline" src="/uploads/${ req.files['cardimg'][0].filename }-thumb.jpeg">
       #${pageId} by ${req.body.author} added! <a class="underline" href="/view/${ pageId }">View</a>
       </div>`);
   } catch (err) {

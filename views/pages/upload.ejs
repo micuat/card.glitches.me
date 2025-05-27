@@ -21,8 +21,14 @@
         type="text" name="author" placeholder="...">
     </div>
     <div class="w-full mb-8 flex flex-col">
-      <label for="cardimg">Photo </label>
+      <label for="cardimg">Card Photo </label>
       <input type="file" id="cardimg" name="cardimg" accept="image/png, image/jpeg"
+        class="file:mr-4 file:border-2 file:border-sky-500 file:px-4 file:py-2 file:rounded-none
+          file:text-sm file:font-semibold hover:file:bg-gray-70 invalid:file:border-red-500""/>
+    </div>
+    <div class="w-full mb-8 flex flex-col">
+      <label for="cardimg">More Photos (optional) </label>
+      <input type="file" id="cardimg" name="cardimg" accept="image/png, image/jpeg" multiple
         class="file:mr-4 file:border-2 file:border-sky-500 file:px-4 file:py-2 file:rounded-none
           file:text-sm file:font-semibold hover:file:bg-gray-70 invalid:file:border-red-500""/>
     </div>
@@ -30,6 +36,9 @@
       Submit
       <img id="spinner" class="htmx-indicator w-6 h-6 inline" src="/public/spinner.gif"/>
     </button>
+    <input type="reset" value="Reset"
+      class="border-2 border-sky-500 py-2 hover:bg-gray-70 disabled:bg-gray-50 rounded-none">
+    </input>
     <div id="response" class="min-h-8">
     </div>
     <div>By submitting the card, you agree to share it under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International</a> license.</div>
