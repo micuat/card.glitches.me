@@ -15,6 +15,27 @@ router.get("/:pageId", (req, res) => {
   });
 })
 
+router.get("/double/:pageId", (req, res) => {
+  const pageId = req.params.pageId.toUpperCase();
+  if (pageId.length != 4) {
+    res.status(400).send('<div>page id not valid</div>');
+    return;
+  }
+  const pageCode = pageId[0];
+  const pageStart = parseInt(pageId.slice(1));
+  const nextPageId = pageCode + String(pageStart+1).padStart(3, '0');
+  QRCode.toString(`https://card.glitches.me/view/${ pageId }`, { type: "svg" }, function (err, string) {
+    if (err) throw err
+    res.render("pages/print-double", {
+      pageId,
+      nextPageId,
+      qrcode: string.replace(/<\/?svg[^>]*>/g, "").replace(/<path fill[^>]*>/g, ""),
+      metadata: null,
+    });
+  });
+})
+
+
 router.get("/batch/:pageId", async (req, res) => {
   const pageId = req.params.pageId.toUpperCase();
   if (pageId.length != 4) {
