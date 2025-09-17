@@ -72,6 +72,7 @@ async function genNextList(start) {
 app.get("/", async (req, res) => {
   res.render("pages/index", {
     list: await genNextList(0),
+    tags: ["first", "second"],
     metadata: null,
   });
 })
@@ -79,7 +80,7 @@ app.get("/", async (req, res) => {
 app.get("/next", async (req, res) => {
   const start = req.query.start === undefined ? 0 : parseInt(req.query.start);
 
-  res.render("pages/next", {
+  res.render("partials/next", {
     list: await genNextList(start),
     metadata: null,
   });
