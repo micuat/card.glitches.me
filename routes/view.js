@@ -4,6 +4,17 @@ import db from "../db.js";
 
 const router = express.Router();
 
+const hardCodedLinks = {
+  C116: "https://www.youtube.com/embed/EvK910VavdI",
+  C118: "https://www.youtube.com/embed/5DIPk4ADGl0",
+  C117: "https://www.youtube.com/embed/qYbrkJvvG58",
+  C115: "https://www.youtube.com/embed/729pl5ywAnc",
+  C119: "https://www.youtube.com/embed/giFkuFGsc74",
+  C111: "https://www.youtube.com/embed/sFlCZHM2kEM",
+  C112: "https://www.youtube.com/embed/csnNNMsPw2A",
+  C120: "https://www.youtube.com/embed/7W4E1JwgvnM",
+}
+
 router.get("/:pageId", async (req, res) => {
   const pageId = req.params.pageId.toUpperCase();
 
@@ -30,6 +41,11 @@ router.get("/:pageId", async (req, res) => {
       }
     }
 
+    let linkView = "";
+    if (hardCodedLinks[pageId] !== undefined) {
+      linkView = `<iframe class="w-full aspect-[9/16]" src="${hardCodedLinks[pageId]}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`
+    }
+
     res.render("pages/view", {
       pageId,
       filename: `/uploads/${ snapshot.val().filenameMid }`,
@@ -39,6 +55,7 @@ router.get("/:pageId", async (req, res) => {
         // ocrRaw: JSON.stringify(snapshot.val().ocr),
         ocr,
         morePaths,
+        linkView,
       },
     });
   }

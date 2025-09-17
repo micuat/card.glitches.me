@@ -11,6 +11,8 @@
     View <%= pageId %>
   </h1>
 
+  <%- metadata.linkView %>
+
   <img class="max-w-xl" src="<%= filename %>" alt="<%= metadata.ocr %>" />
 
   <% metadata.morePaths.forEach(function(path) { %>
