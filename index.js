@@ -10,6 +10,7 @@ import viewRouter from "./routes/view.js";
 import exprRouter from "./routes/expr.js";
 import editRouter from "./routes/edit.js";
 import printRouter from "./routes/print.js";
+import tagRouter from "./routes/tag.js";
 
 import db from "./db.js";
 
@@ -49,9 +50,10 @@ app.use('/view', viewRouter);
 app.use('/expr', exprRouter);
 app.use('/edit', editRouter);
 app.use('/print', printRouter);
+app.use('/tag', tagRouter);
 
-const tags = [];
 {
+  const tags = [];
   const tagMap = {};
   const log = (await db.ref(`card-set`).get()).val();
   const keys = Object.keys(log);
@@ -72,7 +74,7 @@ const tags = [];
         }
         let words = line.text.split(" ");
         words = words.filter(e => e.length >= 4);
-        words = words.map(e => e.toUpperCase());
+        words = words.map(e => e.toLowerCase());
         words = words.map(e => e.replace(/[#,\.\(\)\']/g, ""));
         for (const word of words) {
           if (tagMap[word] === undefined) {
@@ -87,9 +89,12 @@ const tags = [];
     }
   }
   for (const key of Object.keys(tagMap)) {
-    tags.push({ name: key, count: tagMap[key].count });
+    tags.push({ name: key, count: tagMap[key].count, pages: tagMap[key].pages });
   }
   tags.sort((a, b) => b.count - a.count);
+  const ref = await db.ref(`tags`).update(
+    tags
+  );
 }
 
 async function genNextList(start) {
@@ -112,6 +117,7 @@ async function genNextList(start) {
 }
 
 app.get("/", async (req, res) => {
+  const tags = (await db.ref('tags').get()).val();
   res.render("pages/index", {
     list: await genNextList(0),
     tags: tags.filter(e => e.count > 2 && e.name !== "NAOTO"),
