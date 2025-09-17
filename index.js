@@ -82,7 +82,9 @@ app.use('/tag', tagRouter);
           }
           else {
             tagMap[word].count++;
-            tagMap[word].pages.push(key);
+            if (tagMap[word].pages.findIndex(e => e === key) < 0) {
+              tagMap[word].pages.push(key);
+            }
           }
         }
       }
@@ -120,7 +122,7 @@ app.get("/", async (req, res) => {
   const tags = (await db.ref('tags').get()).val();
   res.render("pages/index", {
     list: await genNextList(0),
-    tags: tags.filter(e => e.count > 2 && e.name !== "NAOTO"),
+    tags: tags.filter(e => e.count > 2 && e.name !== "naoto"),
     metadata: null,
   });
 })
