@@ -1,6 +1,5 @@
 <div class="">
-  tags
   <% for(var i=0; i<tags.length; i++) {%>
-      <div class="text-lg inline"><%= tags[i] %></div>
+      <div class="mx-1 my-1 text-lg inline border-2 border-black"><%= tags[i].name %><span class="text-sm hidden"><%= tags[i].freq %></span></div>
   <% } %>
 </div>

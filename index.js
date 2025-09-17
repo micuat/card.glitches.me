@@ -50,6 +50,48 @@ app.use('/expr', exprRouter);
 app.use('/edit', editRouter);
 app.use('/print', printRouter);
 
+const tags = [];
+{
+  const tagMap = {};
+  const log = (await db.ref(`card-set`).get()).val();
+  const keys = Object.keys(log);
+
+  for (const key of keys) {
+    const card = log[key]
+    if (card.ocr === undefined || card.ocr === "") {
+      continue;
+    }
+    let json = JSON.parse(card.ocr);
+    if (json.blocks === undefined) {
+      continue;
+    }
+    for (const block of json.blocks) {
+      for (const line of block?.lines) {
+        if (line.text === "2025 glitches.me") {
+          continue;
+        }
+        let words = line.text.split(" ");
+        words = words.filter(e => e.length >= 4);
+        words = words.map(e => e.toUpperCase());
+        words = words.map(e => e.replace(/[#,\.\(\)\']/g, ""));
+        for (const word of words) {
+          if (tagMap[word] === undefined) {
+            tagMap[word] = { count: 1, pages: [key] };
+          }
+          else {
+            tagMap[word].count++;
+            tagMap[word].pages.push(key);
+          }
+        }
+      }
+    }
+  }
+  for (const key of Object.keys(tagMap)) {
+    tags.push({ name: key, count: tagMap[key].count });
+  }
+  tags.sort((a, b) => b.count - a.count);
+}
+
 async function genNextList(start) {
   const N = 10;
   const log = (await db.ref('card-set').get()).val();
@@ -72,7 +114,7 @@ async function genNextList(start) {
 app.get("/", async (req, res) => {
   res.render("pages/index", {
     list: await genNextList(0),
-    tags: ["first", "second"],
+    tags: tags.filter(e => e.count > 2 && e.name !== "NAOTO"),
     metadata: null,
   });
 })
