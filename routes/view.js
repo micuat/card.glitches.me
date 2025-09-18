@@ -22,6 +22,7 @@ router.get("/:pageId", async (req, res) => {
   const dataAvailable = snapshot.exists();
 
   if (dataAvailable) {
+    const tags = [];
     let ocr = "";
     if (snapshot.val().ocr !== undefined && snapshot.val().ocr !== "") {
       let json = JSON.parse(snapshot.val().ocr);
@@ -29,6 +30,14 @@ router.get("/:pageId", async (req, res) => {
         for (const block of json.blocks) {
           for (const line of block?.lines) {
             ocr += line.text + " ";
+            if (line.text === "2025 glitches.me") {
+              continue;
+            }
+            let words = line.text.split(" ");
+            words = words.filter(e => e.length >= 4);
+            words = words.map(e => e.toLowerCase());
+            words = words.map(e => e.replace(/[#,\.\(\)\']/g, ""));
+            tags.push(...words.map(e => { return { name: e, freq: 1 }}));
           }
         }
       }
@@ -49,6 +58,7 @@ router.get("/:pageId", async (req, res) => {
     res.render("pages/view", {
       pageId,
       filename: `/uploads/${ snapshot.val().filenameMid }`,
+      tags,
       metadata: {
         title: `${ pageId } by ${ snapshot.val().author }`,
         image: `/uploads/${ snapshot.val().filenameMid }`,
