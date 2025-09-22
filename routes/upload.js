@@ -77,35 +77,49 @@ router.post("/", upload.fields([{ name: 'cardimg', maxCount: 1 }, { name: 'morei
   console.log(morePaths)
 
   try {
+    let pageId;
+
     const decoderArgs = process.env.USE_DUMMY_QR_DECODER != 0 ?
-      ["./qrdecoder.py", "-d", "https://card.glitches.me/view/A002", "dummyfilename"] :
+      ["./qrdecoder.py", "-d", "dummy-output", "dummyfilename"] :
       ["./qrdecoder.py", `uploads/${ cardPaths.filename }`];
     const stdout = execFileSync("python3", decoderArgs, {
       stdio: "pipe",
       encoding: "utf8",
     });
 
-    // TODO: condition - if no result vs multiple lines
-    if (stdout == "") {
-      return res.status(400).send(`<div class="text-red-400">
-        QR code not detected! This may be because the photo is blurry or the QR code is hidden.
-        </div>`);
+    async function generatePageId() {
+      let prefix = "Q";
+      let index = 1;
+      let newPageId;
+      const log = (await db.ref('card-set').get()).val();
+      const keys = Object.keys(log);
+      while (index < 100000) {
+        newPageId = prefix + String(index).padStart(3, '0');
+        if (!keys.includes(newPageId)) {
+          break;
+        }
+        index++;
+      }
+      return newPageId;
     }
 
-    const stdoutLines = stdout.split("\n").filter(s => s.length > 0);
-
-    if (stdoutLines.length > 1) {
-      return res.status(400).send(`<div class="text-red-400">
-        Multiple QR code detected! Please make sure only one card is in the photo.
-        </div>`);
+    if (stdout === undefined || stdout == "") {
+      // QR code not detected!
+      pageId = await generatePageId();
     }
+    else {
+      const stdoutLines = stdout.split("\n").filter(s => s.length > 0);
 
-    const pageId = stdoutLines[0].split("https://card.glitches.me/view/")[1];
+      if (stdoutLines.length > 1) {
+        // Multiple QR code detected!
+      }
 
-    if (pageId == null) {
-      return res.status(400).send(`<div>
-        QR code corrupted! Did you really take a photo of the card?
-        </div>`);
+      pageId = stdoutLines[0].split("https://card.glitches.me/view/")[1];
+
+      if (pageId == null) {
+        // QR code corrupted! 
+        pageId = await generatePageId();
+      }
     }
 
     const newCard = {
