@@ -57,11 +57,15 @@ async function compressImage(file) {
 
 router.post("/", upload.fields([{ name: 'cardimg', maxCount: 1 }, { name: 'moreimg', maxCount: 3 }]),
   async (req, res) => {
-  if (!req.files['cardimg'][0]) {
-    res.status(400).send('<div>No file uploaded.</div>');
+  if (!req.body.author) {
+    res.status(400).send('<div class="text-red-400">Please provide author name.</div>');
     return;
   }
 
+  if (!req.files['cardimg'] || !req.files['cardimg'][0]) {
+    res.status(400).send('<div class="text-red-400">No file uploaded.</div>');
+    return;
+  }
   const cardPaths = await compressImage(req.files['cardimg'][0]);
   const morePaths = [];
 
@@ -70,7 +74,7 @@ router.post("/", upload.fields([{ name: 'cardimg', maxCount: 1 }, { name: 'morei
       morePaths[i] = await compressImage(req.files['moreimg'][i]);
     }
   }
-console.log(morePaths)
+  console.log(morePaths)
 
   try {
     const decoderArgs = process.env.USE_DUMMY_QR_DECODER != 0 ?
@@ -83,25 +87,25 @@ console.log(morePaths)
 
     // TODO: condition - if no result vs multiple lines
     if (stdout == "") {
-      return res.send(`<div class="text-red-400">
+      return res.status(400).send(`<div class="text-red-400">
         QR code not detected! This may be because the photo is blurry or the QR code is hidden.
-        </div>`); // TODO: make it error code
+        </div>`);
     }
 
     const stdoutLines = stdout.split("\n").filter(s => s.length > 0);
 
     if (stdoutLines.length > 1) {
-      return res.send(`<div class="text-red-400">
+      return res.status(400).send(`<div class="text-red-400">
         Multiple QR code detected! Please make sure only one card is in the photo.
-        </div>`); // TODO: make it error code
+        </div>`);
     }
 
     const pageId = stdoutLines[0].split("https://card.glitches.me/view/")[1];
 
     if (pageId == null) {
-      return res.send(`<div>
+      return res.status(400).send(`<div>
         QR code corrupted! Did you really take a photo of the card?
-        </div>`); // TODO: make it error code
+        </div>`);
     }
 
     const newCard = {
@@ -125,9 +129,9 @@ console.log(morePaths)
       const { stdout, stderr } = err;
       console.error({ stdout, stderr });
     }
-    return res.send(`<div>
+    return res.status(500).send(`<div>
       Internal error, sorry!
-      </div>`); // TODO: make it error code
+      </div>`);
   }
 
 });
