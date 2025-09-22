@@ -32,7 +32,7 @@
         class="file:mr-4 file:border-2 file:border-sky-500 file:px-4 file:py-2 file:rounded-none
           file:text-sm file:font-semibold hover:file:bg-gray-70 invalid:file:border-red-500""/>
     </div>
-    <button class="border-2 border-sky-500 py-8 hover:bg-gray-70 disabled:bg-gray-50 rounded-none font-bold">
+    <button id="submit-button" class="border-2 border-sky-500 py-8 hover:bg-gray-70 disabled:bg-gray-50 disabled:border-gray-500 rounded-none font-bold">
       Submit
       <img id="spinner" class="htmx-indicator w-6 h-6 inline" src="/public/spinner.gif"/>
     </button>
@@ -50,6 +50,12 @@
 <script>
   const authorName = localStorage.getItem("authorName");
   document.querySelector("#author").value = authorName;
+
+  document.querySelector("#submit-button").disabled = authorName === null;
+  document.querySelector("#author").oninput = function (e) {
+    const authorName = e.target.value;
+    document.querySelector("#submit-button").disabled = authorName === "";
+  }
 
   function resetAfterRequest() {
     const authorName = document.querySelector("#author").value;
