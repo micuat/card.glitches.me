@@ -5,10 +5,14 @@ const router = express.Router();
 
 router.get("/:pageId", (req, res) => {
   const pageId = req.params.pageId.toUpperCase();
+  const pageCode = pageId[0];
+  const pageStart = parseInt(pageId.slice(1));
+  const nextPageId = pageCode + String(pageStart+1).padStart(3, '0');
   QRCode.toString(`https://card.glitches.me/view/${ pageId }`, { type: "svg" }, function (err, string) {
     if (err) throw err
     res.render("pages/print", {
       pageId,
+      nextPageId,
       qrcode: string.replace(/<\/?svg[^>]*>/g, "").replace(/<path fill[^>]*>/g, ""),
       metadata: null,
     });

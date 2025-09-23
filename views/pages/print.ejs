@@ -212,12 +212,17 @@
     </g>
   </svg>
 
+  <button class="bg-grey-500" onclick="next()">next</button>
   <button class="bg-grey-500" onclick="downloadPNG()">download</button>
 
   <%- include('../partials/footer') %>
 </main>
 
 <script>
+  function next() {
+    window.location.href = "/print/<%= nextPageId %>";
+  }
+
   //https://www.beaubus.com/blog/how_to_save_inline_svg_as_png_with_vanilla_javascript_and_html_canvas.html
 
   function downloadPNG() {
