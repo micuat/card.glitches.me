@@ -102,7 +102,7 @@ app.use('/tag', tagRouter);
 async function genNextList(start) {
   const N = 10;
   const log = (await db.ref('card-set').get()).val();
-  const keys = Object.keys(log).reverse();
+  const keys = Object.keys(log).sort((a, b) => log[a].date - log[b].date).reverse();
   const files = keys.slice(start, start + N).map(function (key) {
     return {
       pageId: key,
