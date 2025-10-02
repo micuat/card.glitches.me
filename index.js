@@ -136,6 +136,10 @@ app.get("/next", async (req, res) => {
   });
 })
 
+app.get("/workshop", async (req, res) => {
+  res.redirect("/");
+})
+
 const server = app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
