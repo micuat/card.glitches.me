@@ -212,8 +212,8 @@
     </g>
   </svg>
 
-  <button class="bg-grey-500" onclick="next()">next</button>
-  <button class="bg-grey-500" onclick="downloadPNG()">download</button>
+  <!--<button class="bg-grey-500" onclick="next()">next</button>-->
+  <button class="bg-grey-500" onclick="downloadPNG()">download & next</button>
 
   <%- include('../partials/footer') %>
 </main>
@@ -255,6 +255,8 @@
         link.setAttribute('download', `template-<%= pageId %>.png`);
         link.setAttribute('href', canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"));
         link.click();
+
+        next();
     };
 
     // btoa — binary string to ASCII (Base64-encoded)
