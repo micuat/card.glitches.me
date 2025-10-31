@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 
 import uploadRouter from "./routes/upload.js";
 import privacyRouter from "./routes/privacy.js";
+import meetupRouter from "./routes/meetup.js";
 import aboutRouter from "./routes/about.js";
 import viewRouter from "./routes/view.js";
 import exprRouter from "./routes/expr.js";
@@ -44,6 +45,7 @@ app.use("/public", express.static("public"))
 app.use("/uploads", express.static("uploads"))
 
 app.use('/privacy', privacyRouter);
+app.use('/meetup', meetupRouter);
 app.use('/about', aboutRouter);
 app.use('/upload', uploadRouter);
 app.use('/view', viewRouter);
