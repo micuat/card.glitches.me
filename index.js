@@ -4,14 +4,13 @@ import express from "express";
 import bodyParser from "body-parser";
 
 import uploadRouter from "./routes/upload.js";
-import privacyRouter from "./routes/privacy.js";
-import meetupRouter from "./routes/meetup.js";
-import aboutRouter from "./routes/about.js";
+import staticRouter from "./routes/static.js";
 import viewRouter from "./routes/view.js";
 import exprRouter from "./routes/expr.js";
 import editRouter from "./routes/edit.js";
 import printRouter from "./routes/print.js";
 import tagRouter from "./routes/tag.js";
+import adminRouter from "./routes/admin.js";
 
 import db from "./db.js";
 
@@ -44,15 +43,14 @@ app.use(bodyParser.json());
 app.use("/public", express.static("public"))
 app.use("/uploads", express.static("uploads"))
 
-app.use('/privacy', privacyRouter);
-app.use('/meetup', meetupRouter);
-app.use('/about', aboutRouter);
+app.use('/', staticRouter);
 app.use('/upload', uploadRouter);
 app.use('/view', viewRouter);
 app.use('/expr', exprRouter);
 app.use('/edit', editRouter);
 app.use('/print', printRouter);
 app.use('/tag', tagRouter);
+app.use('/admin', adminRouter);
 
 {
   const tags = [];

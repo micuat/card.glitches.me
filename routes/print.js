@@ -10,7 +10,7 @@ router.get("/:pageId", (req, res) => {
   const nextPageId = pageCode + String(pageStart+1).padStart(3, '0');
   QRCode.toString(`https://card.glitches.me/view/${ pageId }`, { type: "svg" }, function (err, string) {
     if (err) throw err
-    res.render("pages/print", {
+    res.render("pages/print/index", {
       pageId,
       nextPageId,
       qrcode: string.replace(/<\/?svg[^>]*>/g, "").replace(/<path fill[^>]*>/g, ""),
@@ -30,7 +30,7 @@ router.get("/double/:pageId", (req, res) => {
   const nextPageId = pageCode + String(pageStart+1).padStart(3, '0');
   QRCode.toString(`https://card.glitches.me/view/${ pageId }`, { type: "svg" }, function (err, string) {
     if (err) throw err
-    res.render("pages/print-double", {
+    res.render("pages/print/double", {
       pageId,
       nextPageId,
       qrcode: string.replace(/<\/?svg[^>]*>/g, "").replace(/<path fill[^>]*>/g, ""),
@@ -68,7 +68,7 @@ router.get("/batch/:pageId", async (req, res) => {
     }
   }
 
-  res.render("pages/print-batch", {
+  res.render("pages/print/batch", {
     pageId,
     nextPageId,
     pages,
