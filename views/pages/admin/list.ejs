@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../../partials/head'); %>
+</head>
+<body>
+<div class="flex justify-center w-full">
+
+<main class="relative flex flex-col h-full max-w-lg w-full">
+<% for(var i=0; i<list.files.length; i++) {%>
+  <!-- <a class="relative" href="/view/<%= list.files[i].pageId %>"> -->
+    <!-- <div class=""><div class="font-bold"><%= list.files[i].title %></div><%= list.files[i].ocr %> by <%= list.files[i].author %> at <%= list.files[i].date %></div> -->
+<pre>---
+id: <%= list.files[i].date %>
+title: "<%= list.files[i].title %>"
+author: "<%= list.files[i].author %>"
+thumbnail: "<%= list.files[i].filename %>"
+---
+
+<% if (list.files[i].parent) { %>
+may refer to [[<%= list.files[i].parent.date %>|<%= list.files[i].parent.pageId %>]]
+<% } %>
+
+<%= list.files[i].ocr %>
+
+--break--
+
+</pre>
+
+  <!-- </a> -->
+<% } %>
+</main>
+
+<script></script>
+
+</div>
+</body>
+</html>
