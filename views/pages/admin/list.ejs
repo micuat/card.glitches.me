@@ -21,6 +21,10 @@ thumbnail: "<%= list.files[i].filename %>"
 may refer to [[<%= list.files[i].parent.date %>|<%= list.files[i].parent.pageId %>]]
 <% } %>
 
+<% if (list.files[i].parentEvent) { %>
+may be same event as [[<%= list.files[i].parentEvent.date %>|<%= list.files[i].parentEvent.pageId %>]]
+<% } %>
+
 <%= list.files[i].ocr %>
 
 --break--

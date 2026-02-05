@@ -9,6 +9,8 @@ async function genList() {
   const keys = Object.keys(log).sort((a, b) => log[a].date - log[b].date)
   const files = [];
   const parentNodes = {};
+  let lastEvent = {};
+  let lastEventDate = 0;
 
   for (const pageId of keys) {
     const snapshot = await db.ref(`card-set/${pageId}`).get();
@@ -18,7 +20,17 @@ async function genList() {
     let title = "";
     let ocr = "";
     let parent = null;
+    let parentEvent = null;
     if (dataAvailable) {
+      if (date - lastEventDate > 1 * 24 * 60 * 60 * 1000) {
+        // more than a day has passed
+        lastEventDate = date;
+        lastEvent = { pageId, date };
+      }
+      else {
+        parentEvent = lastEvent;
+      }
+
       const tags = [];
       if (snapshot.val().ocr !== undefined && snapshot.val().ocr !== "") {
         let json = JSON.parse(snapshot.val().ocr);
@@ -31,7 +43,7 @@ async function genList() {
                 if (parentNodes[titleShrunk] !== undefined) {
                   parent = parentNodes[titleShrunk];
                 }
-                parentNodes[titleShrunk] = { pageId, date }
+                parentNodes[titleShrunk] = { pageId, date };
               }
               ocr += line.text + " ";
               if (line.text === "2025 glitches.me") {
@@ -52,6 +64,7 @@ async function genList() {
       pageId,
       date,
       parent,
+      parentEvent,
       filename: `${ log[pageId].filenameThumb }`,
       author: log[pageId].author,
       title,
