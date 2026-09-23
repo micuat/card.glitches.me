@@ -140,6 +140,10 @@ app.get("/workshop", async (req, res) => {
   res.redirect("/");
 })
 
+app.get("/deck", async (req, res) => {
+  res.redirect("https://docs.google.com/presentation/d/17I4kmc_3ZMOlleRuf1ISY0ugFrMp862jXl9q7z4K5yU/edit?usp=sharing");
+})
+
 const server = app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
