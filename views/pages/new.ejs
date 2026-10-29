@@ -96,6 +96,29 @@ button {
   color: black;
   touch-action: none;
 }
+
+#overlay-background {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+}
+
+#overlay {
+  padding: 1rem;
+  background-color: white;
+  border-radius: 0.5rem;
+  color: black;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+#author {
+  background-color: lightgray;
+}
   </style>
 </head>
 <body>
@@ -106,6 +129,16 @@ button {
       <!-- <img src="/public/template.png" alt="Card" /> -->
       <button id="undo" type="button" aria-label="Undo">UNDO</button>
       <button id="submit" type="button" aria-label="Undo">SUBMIT</button>
+      <div id="overlay-background">
+        <div id="overlay">
+          <div>
+            Your name
+            <input type="text" id="author" name="author" placeholder="..." />
+          </div>
+          <button id="overlay-submit" type="button">Submit</button>
+          <button id="overlay-cancel" type="button">Cancel</button>
+        </div>
+      </div>
     </div>
 </main>
 
@@ -126,10 +159,19 @@ async function setup() {
   canvas.elt.addEventListener("pointermove", drawPointer);
   canvas.elt.addEventListener("pointerup", stopDrawing);
   canvas.elt.addEventListener("pointercancel", stopDrawing);
-  const undoButton = document.getElementById("undo");
 
+  const undoButton = document.getElementById("undo");
   undoButton.addEventListener("click", undoStroke);
+
+  const submitButton = document.getElementById("submit");
+  submitButton.addEventListener("click", promptAuthor);
   
+  const finalSubmitButton = document.getElementById("overlay-submit");
+  finalSubmitButton.addEventListener("click", submitCard);
+
+  const finalCancelButton = document.getElementById("overlay-cancel");
+  finalCancelButton.addEventListener("click", cancelCard);
+
   function undoStroke(event) {
     event.preventDefault();
   
@@ -139,6 +181,77 @@ async function setup() {
   
     // Remove the current/last stroke
     pathes.pop();
+  }
+
+  function promptAuthor(event) {
+    event.preventDefault();
+    const overlayBackground = document.getElementById("overlay-background");
+    overlayBackground.style.display = "grid";
+  }
+
+  async function submitCard(event) {
+    event.preventDefault();
+
+    const authorName = document
+      .getElementById("author")
+      .value
+      .trim();
+
+    if (!authorName) {
+      alert("Please enter your name.");
+      return;
+    }
+
+    const overlayBackground =
+      document.getElementById("overlay-background");
+
+    const blob = await new Promise((resolve) => {
+      canvas.elt.toBlob(resolve, "image/png");
+    });
+
+    if (!blob) {
+      alert("Could not create image.");
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("author", authorName);
+    formData.append(
+      "cardimg",
+      blob,
+      `card-${Date.now()}.png`
+    );
+
+    try {
+      const response = await fetch("/upload", {
+        method: "POST",
+        body: formData
+      });
+
+      // Your endpoint returns HTML, not JSON
+      const result = await response.text();
+
+      if (!response.ok) {
+        throw new Error(result);
+      }
+
+      overlayBackground.style.display = "none";
+
+      // Display the server response, or redirect as desired
+      document.body.insertAdjacentHTML("beforeend", result);
+
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Upload failed:", error);
+      alert("Upload failed. Please try again.");
+    }
+  }
+
+  function cancelCard(event) {
+    event.preventDefault();
+    const overlayBackground = document.getElementById("overlay-background");
+    overlayBackground.style.display = "none";
   }
 }
 
