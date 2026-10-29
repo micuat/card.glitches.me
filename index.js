@@ -4,6 +4,7 @@ import express from "express";
 import bodyParser from "body-parser";
 
 import uploadRouter from "./routes/upload.js";
+import newRouter from "./routes/new.js";
 import staticRouter from "./routes/static.js";
 import viewRouter from "./routes/view.js";
 import exprRouter from "./routes/expr.js";
@@ -45,6 +46,7 @@ app.use("/uploads", express.static("uploads"))
 
 app.use('/', staticRouter);
 app.use('/upload', uploadRouter);
+app.use('/new', newRouter);
 app.use('/view', viewRouter);
 app.use('/expr', exprRouter);
 app.use('/edit', editRouter);
