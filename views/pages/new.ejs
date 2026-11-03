@@ -149,8 +149,15 @@ let drawing = false;
 let img;
 const pathes = [];
 
+let overlayBackground;
+
 async function setup() {
-  img = await loadImage('/public/template.png');
+  const paramsString = window.location.search;
+  const searchParams = new URLSearchParams(paramsString);
+  const imgUrl = searchParams.get("img");
+  if (imgUrl !== null) {
+    img = await loadImage('/uploads/' + imgUrl);
+  }
 
   canvas = createCanvas(1669, 2520).parent("stage");
   pixelDensity(1);
@@ -172,6 +179,8 @@ async function setup() {
   const finalCancelButton = document.getElementById("overlay-cancel");
   finalCancelButton.addEventListener("click", cancelCard);
 
+  overlayBackground = document.getElementById("overlay-background");
+
   function undoStroke(event) {
     event.preventDefault();
   
@@ -185,7 +194,6 @@ async function setup() {
 
   function promptAuthor(event) {
     event.preventDefault();
-    const overlayBackground = document.getElementById("overlay-background");
     overlayBackground.style.display = "grid";
   }
 
@@ -292,18 +300,57 @@ function stopDrawing(event) {
 }
 
 function draw() {
-  clear();
-  image(img, 0, 0, width, height);
+  background(255);
 
   noFill();
-  stroke(0);
   strokeWeight(5);
+
+  const D = 300;
+  if (overlayBackground.style.display !== "grid") {
+    if (img !== undefined) {
+      push();
+      tint(255, 50);
+      image(img, 0, 0, width, height);
+      pop();
+    }
+    else {
+      push();
+      stroke(50);
+      translate(width / 2, height / 2);
+      for (let i = 0; i * D < height / 2; i++) {
+        line(-width / 2, i * D, width / 2, i * D);
+        line(-width / 2, -i * D, width / 2, -i * D);
+      }
+      for (let i = 0; i * D < width / 2; i++) {
+        line(i * D, -height / 2, i * D, height / 2);
+        line(-i * D, -height / 2, -i * D, height / 2);
+      }
+      pop();
+    }
+  }
+
+  stroke(0);
 
   for (const points of pathes) {
     beginShape();
 
+    let i = 0;
+    let cdist = 0;
+    let lastP = points[0];
     for (const p of points) {
-      vertex(p[0], p[1]);
+      splineVertex(p[0], p[1]);
+      let d = dist(lastP[0], lastP[1], p[0], p[1]);
+      cdist += d;
+      if (cdist > D || i == 0) {
+        push();
+        fill(0);
+        noStroke();
+        circle(p[0], p[1], 30);
+        pop();
+      }
+      cdist = cdist % D;
+      lastP = p;
+      i++;
     }
 
     endShape();
