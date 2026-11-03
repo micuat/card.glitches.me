@@ -11,25 +11,22 @@
     View <%= pageId %>
   </h1>
 
-  <%- metadata.linkView %>
+  <div class="text-lg">
+    by <%= metadata.author %> 
+   
+    <% if (metadata.remixPageId) { %>
+      (remix of <a href="/view/<%= metadata.remixPageId %>" class="underline"><%= metadata.remixPageId %></a>)
+    <% } %>
+  </div>
 
-  <img class="max-w-xl" src="<%= filename %>" alt="<%= metadata.ocr %>" />
+  <a href="/new?remix=<%= pageId %>" class="font-bold underline">Remix this</a>
 
-  <% metadata.morePaths.forEach(function(path) { %>
-    <img class="max-w-xl" src="/uploads/<%= path %>" alt="additional image" />
-  <% }); %> 
+  <img class="max-w-xl" src="<%= filename %>" />
 
-  <a href="/edit/<%= pageId %>" class="font-bold underline">Edit</a>
-  <a href="/expr/<%= pageId %>" class="font-bold underline">Experiment</a>
-  <!-- <button class="bg-grey-500" onclick="downloadPNG()">download</button> -->
-
-  <%- include('../partials/tags') %>
-
-  <%- include('../partials/footer') %>
+  
+  <a href="/" class="font-bold underline">Back to top page</a>
 
   <div class="my-12"></div>
-  <div>debug info</div>
-  <div><%= metadata.ocr %></div>
 </main>
 
 <script></script>

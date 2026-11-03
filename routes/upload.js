@@ -79,14 +79,6 @@ router.post("/", upload.fields([{ name: 'cardimg', maxCount: 1 }, { name: 'morei
   try {
     let pageId;
 
-    const decoderArgs = process.env.USE_DUMMY_QR_DECODER != 0 ?
-      ["./qrdecoder.py", "-d", "dummy-output", "dummyfilename"] :
-      ["./qrdecoder.py", `uploads/${ cardPaths.filename }`];
-    const stdout = execFileSync("python3", decoderArgs, {
-      stdio: "pipe",
-      encoding: "utf8",
-    });
-
     async function generatePageId() {
       let prefix = "Q";
       let index = 1;
@@ -103,27 +95,11 @@ router.post("/", upload.fields([{ name: 'cardimg', maxCount: 1 }, { name: 'morei
       return newPageId;
     }
 
-    if (stdout === undefined || stdout == "") {
-      // QR code not detected!
-      pageId = await generatePageId();
-    }
-    else {
-      const stdoutLines = stdout.split("\n").filter(s => s.length > 0);
-
-      if (stdoutLines.length > 1) {
-        // Multiple QR code detected!
-      }
-
-      pageId = stdoutLines[0].split("https://card.glitches.me/view/")[1];
-
-      if (pageId == null) {
-        // QR code corrupted! 
-        pageId = await generatePageId();
-      }
-    }
+    pageId = await generatePageId();
 
     const newCard = {
       author: req.body.author,
+      remixPageId: req.body.remixPageId,
       filename: req.files['cardimg'][0].filename,
       filenameMid: `${ req.files['cardimg'][0].filename }-mid.jpeg`,
       filenameThumb: `${ req.files['cardimg'][0].filename }-thumb.jpeg`,

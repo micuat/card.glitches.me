@@ -62,6 +62,8 @@ router.get("/:pageId", async (req, res) => {
       metadata: {
         title: `${ pageId } by ${ snapshot.val().author }`,
         image: `/uploads/${ snapshot.val().filenameMid }`,
+        author: snapshot.val().author,
+        remixPageId: snapshot.val().remixPageId,
         // ocrRaw: JSON.stringify(snapshot.val().ocr),
         ocr,
         morePaths,

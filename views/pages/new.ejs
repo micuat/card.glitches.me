@@ -72,18 +72,26 @@ body {
   touch-action: none;
 }
 
+#back {
+  position: absolute;
+  bottom: -1rem;
+  left: 1rem;
+  width: calc(346 / 1669 * 100%);
+  height: calc(180 / 2520 * 100%);
+}
+
 #undo {
   position: absolute;
-  left: calc(1270 / 1669 * 100%);
-  top: calc(2040 / 2520 * 100%);
+  bottom: -1rem;
+  left: calc(50% - 173 / 1669 * 100%);
   width: calc(346 / 1669 * 100%);
   height: calc(180 / 2520 * 100%);
 }
 
 #submit {
   position: absolute;
-  left: calc(1270 / 1669 * 100%);
-  top: calc(2246 / 2520 * 100%);
+  bottom: -1rem;
+  right: 1rem;
   width: calc(346 / 1669 * 100%);
   height: calc(180 / 2520 * 100%);
 }
@@ -127,6 +135,7 @@ button {
   <main id="canvas-area">
     <div id="stage">
       <!-- <img src="/public/template.png" alt="Card" /> -->
+      <button id="back" type="button" aria-label="Back">BACK</button>
       <button id="undo" type="button" aria-label="Undo">UNDO</button>
       <button id="submit" type="button" aria-label="Undo">SUBMIT</button>
       <div id="overlay-background">
@@ -149,18 +158,22 @@ let drawing = false;
 let img;
 const pathes = [];
 
+let remixImage = "<%= remixImage %>";
+let remixPageId = "<%= remixPageId %>";
+
 let overlayBackground;
 
 async function setup() {
-  const paramsString = window.location.search;
-  const searchParams = new URLSearchParams(paramsString);
-  const imgUrl = searchParams.get("img");
-  if (imgUrl !== null) {
-    img = await loadImage('/uploads/' + imgUrl);
+  console.log(remixImage, remixPageId);
+  if (remixImage != "") {
+    img = await loadImage(remixImage);
   }
 
   canvas = createCanvas(1669, 2520).parent("stage");
   pixelDensity(1);
+
+  const authorName = localStorage.getItem("authorName");
+  document.querySelector("#author").value = authorName;
 
   canvas.elt.addEventListener("pointerdown", startDrawing);
   canvas.elt.addEventListener("pointermove", drawPointer);
@@ -169,6 +182,15 @@ async function setup() {
 
   const undoButton = document.getElementById("undo");
   undoButton.addEventListener("click", undoStroke);
+
+  const backButton = document.getElementById("back");
+  backButton.addEventListener("click", () => {
+    if (document.referrer) {
+      history.back();
+    } else {
+      window.location.href = "/";
+    }
+  });
 
   const submitButton = document.getElementById("submit");
   submitButton.addEventListener("click", promptAuthor);
@@ -205,6 +227,8 @@ async function setup() {
       .value
       .trim();
 
+    localStorage.setItem("authorName", authorName);
+
     if (!authorName) {
       alert("Please enter your name.");
       return;
@@ -225,6 +249,7 @@ async function setup() {
     const formData = new FormData();
 
     formData.append("author", authorName);
+    formData.append("remixPageId", remixPageId);
     formData.append(
       "cardimg",
       blob,
@@ -315,7 +340,7 @@ function draw() {
     }
     else {
       push();
-      stroke(50);
+      stroke(200);
       translate(width / 2, height / 2);
       for (let i = 0; i * D < height / 2; i++) {
         line(-width / 2, i * D, width / 2, i * D);
@@ -324,6 +349,18 @@ function draw() {
       for (let i = 0; i * D < width / 2; i++) {
         line(i * D, -height / 2, i * D, height / 2);
         line(-i * D, -height / 2, -i * D, height / 2);
+      }
+
+      fill(200);
+      noStroke();
+
+      for (let i = 0; i * D < height / 2; i++) {
+        for (let j = 0; j * D < width / 2; j++) {
+          circle(j * D, i * D, 30);
+          circle(-j * D, i * D, 30);
+          circle(-j * D, -i * D, 30);
+          circle(j * D, -i * D, 30);
+        }
       }
       pop();
     }

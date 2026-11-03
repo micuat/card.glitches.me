@@ -19,9 +19,18 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
+  const remixPageId = req.query.remix;
+  let remixImage = null;
+  if (remixPageId !== undefined) {
+    const snapshot = await db.ref(`card-set/${remixPageId}`).get();
+    remixImage = `/uploads/${ snapshot.val().filenameMid }`;
+  }
+  
   res.render("pages/new", {
     metadata: null,
+    remixPageId,
+    remixImage,
   });
 })
 

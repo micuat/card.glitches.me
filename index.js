@@ -204,9 +204,9 @@ async function runOcr() {
 
 runOcr();
 
-setInterval(() => {
-  runOcr();
-}, 1000 * 60);
+// setInterval(() => {
+//   runOcr();
+// }, 1000 * 60);
 
 process.on('SIGINT', function() {
   server.close();
