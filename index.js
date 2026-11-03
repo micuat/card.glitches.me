@@ -26,6 +26,9 @@ const createClient = ImageAnalysis.default;
   let log = snapshot.val();
   if (log === null) {
     console.log("no data found");
+    const ref = await db.ref(`card-set`).update(
+      {}
+    );
   }
   else {
     console.log("data found:", log);
