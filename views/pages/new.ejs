@@ -157,6 +157,7 @@ let path = null;
 let drawing = false;
 let img;
 const pathes = [];
+const activePaths = new Map();
 
 let remixImage = "<%= remixImage %>";
 let remixPageId = "<%= remixPageId %>";
@@ -274,7 +275,9 @@ async function setup() {
       // Display the server response, or redirect as desired
       document.body.insertAdjacentHTML("beforeend", result);
 
-      window.location.href = "/";
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 500);
     } catch (error) {
       console.error("Upload failed:", error);
       alert("Upload failed. Please try again.");
@@ -297,22 +300,25 @@ function getPosition(event) {
   };
 }
 
+let activePointerId = null;
+
 function startDrawing(event) {
   event.preventDefault();
 
   const p = getPosition(event);
+  const path = [[p.x, p.y]];
 
-  path = [[p.x, p.y]];
   pathes.push(path);
-  drawing = true;
+  activePaths.set(event.pointerId, path);
 
   canvas.elt.setPointerCapture(event.pointerId);
 }
 
 function drawPointer(event) {
-  if (!drawing) return;
-
   event.preventDefault();
+
+  const path = activePaths.get(event.pointerId);
+  if (!path) return;
 
   const p = getPosition(event);
   path.push([p.x, p.y]);
@@ -320,8 +326,8 @@ function drawPointer(event) {
 
 function stopDrawing(event) {
   event.preventDefault();
-  drawing = false;
-  path = null;
+
+  activePaths.delete(event.pointerId);
 }
 
 function draw() {
